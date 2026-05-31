@@ -25,8 +25,10 @@ public enum RequestStatus
 {
     Pending,
     InProgress,
+    Approved,
     Ready,
     Delivered,
+    Rejected,
     Cancelled
 }
 

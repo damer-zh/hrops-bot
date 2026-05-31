@@ -20,4 +20,6 @@ public class Employee
     public ICollection<CertificateRequest> CertificateRequests { get; set; } = [];
     public ICollection<EquipmentRequest> EquipmentRequests { get; set; } = [];
     public ICollection<TaskItem> Tasks { get; set; } = [];
+    public ICollection<ItRequest> ItRequests { get; set; } = [];
+    public OnboardingProgress? OnboardingProgress { get; set; }
 }

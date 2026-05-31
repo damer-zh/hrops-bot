@@ -16,6 +16,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<HrAppointment> HrAppointments => Set<HrAppointment>();
     public DbSet<CsatScore> CsatScores => Set<CsatScore>();
     public DbSet<RequestLog> RequestLogs => Set<RequestLog>();
+    public DbSet<ItRequest> ItRequests => Set<ItRequest>();
+    public DbSet<OnboardingProgress> OnboardingProgresses => Set<OnboardingProgress>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -108,6 +110,23 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasKey(x => x.Id);
             e.HasOne(x => x.Employee).WithMany()
                 .HasForeignKey(x => x.EmployeeId);
+        });
+
+        modelBuilder.Entity<ItRequest>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasOne(x => x.Employee).WithMany(x => x.ItRequests)
+                .HasForeignKey(x => x.EmployeeId);
+            e.Property(x => x.SystemName).HasMaxLength(200);
+            e.Property(x => x.Description).HasMaxLength(2000);
+        });
+
+        modelBuilder.Entity<OnboardingProgress>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.HasOne(x => x.Employee).WithOne(x => x.OnboardingProgress)
+                .HasForeignKey<OnboardingProgress>(x => x.EmployeeId);
+            e.Ignore(x => x.ProgressPercent);
         });
     }
 }

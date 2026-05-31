@@ -49,6 +49,7 @@ builder.Services.AddScoped<IHrService, HrService>();
 builder.Services.AddScoped<IDocService, DocService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IItRequestService, ItRequestService>();
 
 // ---- i18n ----
 builder.Services.AddSingleton<I18nService>();
@@ -98,9 +99,8 @@ app.MapHub<HROpsBot.API.Hubs.NotificationHub>("/notifications");
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // Очищаем БД перед созданием, чтобы сбросить старое состояние (__EFMigrationsHistory)
-    await db.Database.EnsureDeletedAsync(); 
-    await db.Database.EnsureCreatedAsync(); // Создаст таблицы, если их нет
+    // Применяем миграции / создаём таблицы
+    await db.Database.EnsureCreatedAsync();
     await SeedData.SeedAsync(db);
 }
 

@@ -1,6 +1,7 @@
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Handlers;
 using HROpsBot.Core.Services;
+using HROpsBot.Core.Interfaces;
 using HROpsBot.Infrastructure.Cache;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -14,7 +15,7 @@ public class TelegramBotAdapter(
     DialogManager dialogManager,
     RedisSessionStore sessionStore,
     CsatService csatService,
-    HROpsBot.Infrastructure.Services.HrService hrService,
+    IHrService hrService,
     ILogger<TelegramBotAdapter> logger)
 {
     public async Task HandleUpdateAsync(Update update)

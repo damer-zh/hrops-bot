@@ -1,14 +1,14 @@
 {$DOMAIN_NAME} {
     # Маршруты для API и SignalR
-    handle_path /api/* {
+    handle /api/* {
         reverse_proxy api:8080
     }
     
-    handle_path /notifications* {
+    handle /notifications* {
         reverse_proxy api:8080
     }
 
-    handle_path /swagger/* {
+    handle /swagger/* {
         reverse_proxy api:8080
     }
 

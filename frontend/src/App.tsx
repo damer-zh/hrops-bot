@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useTelegramUser } from './hooks/useTelegramUser';
 import { AdminDashboard } from './components/AdminDashboard';
 import { EmployeeDashboard } from './components/EmployeeDashboard';
+import { OnboardingForm } from './components/forms/OnboardingForm';
 import api from './api';
 import * as signalR from '@microsoft/signalr';
 
@@ -73,6 +74,11 @@ export const App: React.FC = () => {
         </p>
       </div>
     );
+  }
+
+  // Intercept for Onboarding
+  if (!employee.department) {
+    return <OnboardingForm employeeId={employee.id} onComplete={() => window.location.reload()} />;
   }
 
   return (

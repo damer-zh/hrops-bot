@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
+import { ServiceActions } from './ServiceActions';
 
 interface EmployeeDashboardProps {
   employeeId: number;
@@ -93,6 +94,8 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ employeeId
           )}
         </div>
       </div>
+
+      <ServiceActions employeeId={employeeId} />
     </div>
   );
 };

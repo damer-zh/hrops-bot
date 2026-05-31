@@ -28,8 +28,8 @@ public class HrService(AppDbContext dbContext) : IHrService
                 TelegramId = telegramId,
                 NameRu = fullName,
                 NameKk = fullName,
-                Department = "Новички",
-                Position = "Стажер",
+                Department = "",
+                Position = "",
                 Email = $"{username ?? telegramId.ToString()}@company.kz",
                 HiredAt = DateTime.UtcNow,
                 VacationDaysTotal = 28,
@@ -47,6 +47,17 @@ public class HrService(AppDbContext dbContext) : IHrService
 
         await dbContext.SaveChangesAsync();
         return emp;
+    }
+
+    public async Task UpdateEmployeeProfileAsync(int employeeId, string department, string position)
+    {
+        var emp = await dbContext.Employees.FindAsync(employeeId);
+        if (emp != null)
+        {
+            emp.Department = department;
+            emp.Position = position;
+            await dbContext.SaveChangesAsync();
+        }
     }
 
     // --- Отпуска ---

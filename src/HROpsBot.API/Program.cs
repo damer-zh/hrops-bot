@@ -61,6 +61,7 @@ builder.Services.AddScoped<EquipmentHandler>();
 builder.Services.AddScoped<TaskHandler>();
 builder.Services.AddScoped<AppointmentHandler>();
 builder.Services.AddScoped<FaqHandler>();
+builder.Services.AddScoped<OnboardingHandler>();
 
 // ---- Dialog Manager ----
 builder.Services.AddScoped<DialogManager>();

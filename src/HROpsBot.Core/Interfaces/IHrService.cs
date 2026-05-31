@@ -7,6 +7,7 @@ public interface IHrService
     Task<Employee?> GetEmployeeByTelegramIdAsync(long telegramId);
     Task<Employee?> GetEmployeeByIdAsync(int id);
     Task<Employee> CreateOrUpdateEmployeeAsync(long telegramId, string firstName, string? lastName, string? username);
+    Task UpdateEmployeeProfileAsync(int employeeId, string department, string position);
     
     Task<(int Total, int Used, int Remaining)> GetVacationBalanceAsync(int employeeId);
     Task<VacationRequest?> GetNextVacationAsync(int employeeId);

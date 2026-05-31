@@ -17,6 +17,7 @@ public class DialogManager(
     TaskHandler taskHandler,
     AppointmentHandler appointmentHandler,
     FaqHandler faqHandler,
+    OnboardingHandler onboardingHandler,
     CsatService csatService,
     IHrService hrService,
     I18nService i18n,
@@ -76,6 +77,19 @@ public class DialogManager(
             if (emp != null) state.EmployeeId = emp.Id;
         }
 
+        // Intercept for Onboarding
+        if (state.EmployeeId.HasValue)
+        {
+            var emp = await hrService.GetEmployeeByIdAsync(state.EmployeeId.Value);
+            if (emp != null && string.IsNullOrWhiteSpace(emp.Department))
+            {
+                if (state.CurrentStep != DialogStep.WaitingOnboardingDepartment && state.CurrentStep != DialogStep.WaitingOnboardingPosition)
+                {
+                    return onboardingHandler.StartOnboarding(state);
+                }
+            }
+        }
+
         return nlu.Intent switch
         {
             NluResult.Intents.VacationStatus    => await vacationHandler.HandleAsync(state, userText),
@@ -97,6 +111,8 @@ public class DialogManager(
     {
         return state.CurrentStep switch
         {
+            DialogStep.WaitingOnboardingDepartment => await onboardingHandler.HandleDepartmentAsync(state, userText),
+            DialogStep.WaitingOnboardingPosition => await onboardingHandler.HandlePositionAsync(state, userText),
             DialogStep.WaitingRegulationQuery => await regulationHandler.HandleQueryAsync(state, userText),
             _ => GetFallback(state) // Для остальных шагов ожидаем callback
         };

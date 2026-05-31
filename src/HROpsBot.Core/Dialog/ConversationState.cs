@@ -31,5 +31,7 @@ public enum DialogStep
     WaitingEquipmentType,
     WaitingRegulationQuery,
     WaitingAppointmentSlot,
-    WaitingCsat
+    WaitingCsat,
+    WaitingOnboardingDepartment,
+    WaitingOnboardingPosition
 }

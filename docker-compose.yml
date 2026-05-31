@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hrops-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hropsbot}
+      POSTGRES_USER: ${POSTGRES_USER:-hropsbot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hropsbot_secret}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hropsbot}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: hrops-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: src/HROpsBot.API/Dockerfile
+    container_name: hrops-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Production}
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DB:-hropsbot};Username=${POSTGRES_USER:-hropsbot};Password=${POSTGRES_PASSWORD:-hropsbot_secret}
+      - ConnectionStrings__Redis=redis:6379
+      - Telegram__BotToken=${TELEGRAM_BOT_TOKEN}
+      - Telegram__WebhookUrl=${TELEGRAM_WEBHOOK_URL}
+      - Telegram__WebAppUrl=${TELEGRAM_WEB_APP_URL}
+      - Gemini__ApiKey=${GEMINI_API_KEY}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${TELEGRAM_WEBHOOK_URL:-http://localhost:8080}/api
+    container_name: hrops-frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

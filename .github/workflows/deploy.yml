@@ -1,0 +1,37 @@
+name: Deploy to Google Cloud VM
+
+on:
+  workflow_dispatch: # Позволяет запускать деплой вручную из GitHub интерфейса
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Copy repository to VPS
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "."
+        target: "~/hrops-bot"
+
+    - name: Execute docker-compose
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd ~/hrops-bot
+          # Если .env файла нет, создаем его (потребуется потом заполнить вручную)
+          if [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+          
+          # Запускаем сборку и старт контейнеров
+          docker-compose down
+          docker-compose up -d --build

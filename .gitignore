@@ -55,3 +55,26 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Node.js / Frontend
+node_modules/
+dist/
+build/
+coverage/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.user
+*.swp
+
+# Environment files (never commit secrets)
+.env
+*.env.*
+.env.*.local

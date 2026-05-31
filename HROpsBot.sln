@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{64DF4624-E618-47E9-9E64-1964DDD36CA8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HROpsBot.Domain", "src\HROpsBot.Domain\HROpsBot.Domain.csproj", "{ECC52F65-AAFA-4059-9E92-48EA27E3595F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HROpsBot.Core", "src\HROpsBot.Core\HROpsBot.Core.csproj", "{C19B35F2-7D3A-476B-8368-0C20F582C6ED}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HROpsBot.Infrastructure", "src\HROpsBot.Infrastructure\HROpsBot.Infrastructure.csproj", "{E9CC735B-0331-4EDE-9715-C1817335C6DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HROpsBot.MockAPI", "src\HROpsBot.MockAPI\HROpsBot.MockAPI.csproj", "{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HROpsBot.API", "src\HROpsBot.API\HROpsBot.API.csproj", "{D1EB9FD7-3F24-422E-A381-45BF67A7D52C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECC52F65-AAFA-4059-9E92-48EA27E3595F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECC52F65-AAFA-4059-9E92-48EA27E3595F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECC52F65-AAFA-4059-9E92-48EA27E3595F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECC52F65-AAFA-4059-9E92-48EA27E3595F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C19B35F2-7D3A-476B-8368-0C20F582C6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C19B35F2-7D3A-476B-8368-0C20F582C6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C19B35F2-7D3A-476B-8368-0C20F582C6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C19B35F2-7D3A-476B-8368-0C20F582C6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9CC735B-0331-4EDE-9715-C1817335C6DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9CC735B-0331-4EDE-9715-C1817335C6DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9CC735B-0331-4EDE-9715-C1817335C6DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9CC735B-0331-4EDE-9715-C1817335C6DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EB9FD7-3F24-422E-A381-45BF67A7D52C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EB9FD7-3F24-422E-A381-45BF67A7D52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EB9FD7-3F24-422E-A381-45BF67A7D52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EB9FD7-3F24-422E-A381-45BF67A7D52C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ECC52F65-AAFA-4059-9E92-48EA27E3595F} = {64DF4624-E618-47E9-9E64-1964DDD36CA8}
+		{C19B35F2-7D3A-476B-8368-0C20F582C6ED} = {64DF4624-E618-47E9-9E64-1964DDD36CA8}
+		{E9CC735B-0331-4EDE-9715-C1817335C6DD} = {64DF4624-E618-47E9-9E64-1964DDD36CA8}
+		{CE5C87EC-5CBD-46C1-AEC5-F5B5CCA2D316} = {64DF4624-E618-47E9-9E64-1964DDD36CA8}
+		{D1EB9FD7-3F24-422E-A381-45BF67A7D52C} = {64DF4624-E618-47E9-9E64-1964DDD36CA8}
+	EndGlobalSection
+EndGlobal

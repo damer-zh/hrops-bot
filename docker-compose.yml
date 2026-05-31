@@ -49,8 +49,6 @@ services:
       - Telegram__WebhookUrl=${TELEGRAM_WEBHOOK_URL}
       - Telegram__WebAppUrl=${TELEGRAM_WEB_APP_URL}
       - Gemini__ApiKey=${GEMINI_API_KEY}
-    ports:
-      - "8080:8080"
 
   frontend:
     build:
@@ -62,10 +60,27 @@ services:
     restart: unless-stopped
     environment:
       - VITE_API_URL=${VITE_API_URL:-http://localhost:8080}
-    ports:
-      - "3000:80"
     depends_on:
       - api
 
+  caddy:
+    image: caddy:2-alpine
+    container_name: hrops-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN_NAME=${TELEGRAM_WEBHOOK_URL:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - frontend
+
 volumes:
   pgdata:
+  caddy_data:
+  caddy_config:

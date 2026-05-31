@@ -1,0 +1,19 @@
+{$DOMAIN_NAME} {
+    # Маршруты для API и SignalR
+    handle_path /api/* {
+        reverse_proxy api:8080
+    }
+    
+    handle_path /notifications* {
+        reverse_proxy api:8080
+    }
+
+    handle_path /swagger/* {
+        reverse_proxy api:8080
+    }
+
+    # Все остальные запросы отправляем на React Frontend (Nginx)
+    handle {
+        reverse_proxy frontend:80
+    }
+}

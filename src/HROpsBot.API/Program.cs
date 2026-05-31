@@ -1,4 +1,5 @@
 using HROpsBot.API.BackgroundServices;
+using HROpsBot.Core.Interfaces;
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Handlers;
 using HROpsBot.Core.NLU;
@@ -44,10 +45,10 @@ builder.Services.Configure<GeminiOptions>(opt =>
 builder.Services.AddHttpClient<GeminiNluClient>();
 
 // ---- Real DB Services ----
-builder.Services.AddScoped<HrService>();
-builder.Services.AddScoped<DocService>();
-builder.Services.AddScoped<EquipmentService>();
-builder.Services.AddScoped<TaskService>();
+builder.Services.AddScoped<IHrService, HrService>();
+builder.Services.AddScoped<IDocService, DocService>();
+builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 // ---- i18n ----
 builder.Services.AddSingleton<I18nService>();

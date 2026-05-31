@@ -5,8 +5,8 @@ using HROpsBot.Core.NLU;
 using HROpsBot.Core.Services;
 using HROpsBot.Infrastructure.Cache;
 using HROpsBot.Infrastructure.Persistence;
+using HROpsBot.Infrastructure.Services;
 using HROpsBot.Infrastructure.Telegram;
-using HROpsBot.MockAPI;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using Telegram.Bot;
@@ -43,11 +43,11 @@ builder.Services.Configure<GeminiOptions>(opt =>
 });
 builder.Services.AddHttpClient<GeminiNluClient>();
 
-// ---- Mock API Services ----
-builder.Services.AddSingleton<MockHRService>();
-builder.Services.AddSingleton<MockDocService>();
-builder.Services.AddSingleton<MockEquipmentService>();
-builder.Services.AddSingleton<MockTaskService>();
+// ---- Real DB Services ----
+builder.Services.AddScoped<HrService>();
+builder.Services.AddScoped<DocService>();
+builder.Services.AddScoped<EquipmentService>();
+builder.Services.AddScoped<TaskService>();
 
 // ---- i18n ----
 builder.Services.AddSingleton<I18nService>();

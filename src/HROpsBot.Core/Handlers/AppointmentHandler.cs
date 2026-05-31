@@ -1,11 +1,12 @@
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Services;
-using HROpsBot.MockAPI;
+using HROpsBot.Core.Interfaces;
+using HROpsBot.Core.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HROpsBot.Core.Handlers;
 
-public class AppointmentHandler(MockHRService hrService, I18nService i18n)
+public class AppointmentHandler(IHrService hrService, I18nService i18n)
 {
     public async Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {

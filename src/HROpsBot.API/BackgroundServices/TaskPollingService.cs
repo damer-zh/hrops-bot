@@ -1,5 +1,5 @@
 using HROpsBot.Infrastructure.Telegram;
-using HROpsBot.MockAPI;
+using HROpsBot.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -28,8 +28,8 @@ public class TaskPollingService(
         try
         {
             using var scope = scopeFactory.CreateScope();
-            var taskService = scope.ServiceProvider.GetRequiredService<MockTaskService>();
-            var hrService = scope.ServiceProvider.GetRequiredService<MockHRService>();
+            var taskService = scope.ServiceProvider.GetRequiredService<TaskService>();
+            var hrService = scope.ServiceProvider.GetRequiredService<HrService>();
             var botAdapter = scope.ServiceProvider.GetRequiredService<TelegramBotAdapter>();
 
             var tasks = await taskService.GetAllActiveForNotificationsAsync();

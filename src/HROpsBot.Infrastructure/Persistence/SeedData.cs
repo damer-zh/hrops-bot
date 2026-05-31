@@ -22,31 +22,7 @@ public static class SeedData
                 HiredAt = DateTime.SpecifyKind(new DateTime(2021, 3, 15), DateTimeKind.Utc),
                 VacationDaysTotal = 28,
                 VacationDaysUsed = 10,
-                IsHrAdmin = false
-            },
-            new() {
-                TelegramId = 100000002,
-                NameRu = "Максим Иванов",
-                NameKk = "Максим Иванов",
-                Department = "Маркетинг",
-                Position = "Менеджер по маркетингу",
-                Email = "m.ivanov@company.kz",
-                HiredAt = DateTime.SpecifyKind(new DateTime(2022, 6, 1), DateTimeKind.Utc),
-                VacationDaysTotal = 28,
-                VacationDaysUsed = 5,
-                IsHrAdmin = false
-            },
-            new() {
-                TelegramId = 100000003,
-                NameRu = "Динара Сейткали",
-                NameKk = "Динара Сейтқали",
-                Department = "HR",
-                Position = "HR-менеджер",
-                Email = "d.seitkali@company.kz",
-                HiredAt = DateTime.SpecifyKind(new DateTime(2020, 1, 10), DateTimeKind.Utc),
-                VacationDaysTotal = 28,
-                VacationDaysUsed = 14,
-                IsHrAdmin = true
+                IsHrAdmin = true // Сделаем вас HR-админом для полного доступа
             }
         };
         context.Employees.AddRange(employees);
@@ -132,16 +108,7 @@ public static class SeedData
                 Priority = TaskPriority.Low,
                 Deadline = DateTime.UtcNow.AddDays(-1), // просрочена!
                 ExternalId = "TASK-130"
-            },
-            new() {
-                EmployeeId = employees[1].Id,
-                TitleRu = "Подготовить презентацию для клиента",
-                TitleKk = "Клиент үшін презентация дайындау",
-                Status = TaskItemStatus.InProgress,
-                Priority = TaskPriority.Critical,
-                Deadline = DateTime.UtcNow.AddHours(4),
-                ExternalId = "TASK-201"
-            },
+            }
         };
         context.TaskItems.AddRange(tasks);
 

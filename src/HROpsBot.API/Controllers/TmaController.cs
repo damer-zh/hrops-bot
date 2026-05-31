@@ -1,4 +1,4 @@
-using HROpsBot.MockAPI;
+using HROpsBot.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HROpsBot.API.Controllers;
@@ -6,15 +6,22 @@ namespace HROpsBot.API.Controllers;
 [ApiController]
 [Route("api/tma")]
 public class TmaController(
-    MockHRService hrService,
-    MockEquipmentService equipmentService,
-    MockTaskService taskService) : ControllerBase
+    HrService hrService,
+    EquipmentService equipmentService,
+    TaskService taskService) : ControllerBase
 {
-    [HttpGet("user/{telegramId:long}")]
-    public async Task<IActionResult> GetUser(long telegramId)
+    public class AuthRequest
     {
-        var emp = await hrService.GetEmployeeByTelegramIdAsync(telegramId);
-        if (emp == null) return NotFound(new { error = "Employee not found" });
+        public long Id { get; set; }
+        public string FirstName { get; set; } = "";
+        public string? LastName { get; set; }
+        public string? Username { get; set; }
+    }
+
+    [HttpPost("auth")]
+    public async Task<IActionResult> Auth([FromBody] AuthRequest request)
+    {
+        var emp = await hrService.CreateOrUpdateEmployeeAsync(request.Id, request.FirstName, request.LastName, request.Username);
 
         return Ok(new
         {

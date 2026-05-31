@@ -14,12 +14,25 @@ public class TelegramBotAdapter(
     DialogManager dialogManager,
     RedisSessionStore sessionStore,
     CsatService csatService,
+    HROpsBot.Infrastructure.Services.HrService hrService,
     ILogger<TelegramBotAdapter> logger)
 {
     public async Task HandleUpdateAsync(Update update)
     {
         try
         {
+            User? telegramUser = update.Type switch
+            {
+                UpdateType.Message => update.Message?.From,
+                UpdateType.CallbackQuery => update.CallbackQuery?.From,
+                _ => null
+            };
+
+            if (telegramUser != null)
+            {
+                await hrService.CreateOrUpdateEmployeeAsync(telegramUser.Id, telegramUser.FirstName, telegramUser.LastName, telegramUser.Username);
+            }
+
             if (update.Type == UpdateType.Message && update.Message?.Text != null)
                 await HandleMessageAsync(update.Message);
             else if (update.Type == UpdateType.CallbackQuery && update.CallbackQuery != null)

@@ -13,7 +13,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     if (user?.id) {
-      api.get(`tma/user/${user.id}`)
+      api.post('tma/auth', user)
          .then(res => setEmployee(res.data))
          .catch(err => {
             console.error(err);

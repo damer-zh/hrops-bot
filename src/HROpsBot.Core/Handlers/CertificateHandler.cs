@@ -1,12 +1,13 @@
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Services;
 using HROpsBot.Domain.Entities;
-using HROpsBot.MockAPI;
+using HROpsBot.Core.Interfaces;
+using HROpsBot.Core.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HROpsBot.Core.Handlers;
 
-public class CertificateHandler(MockHRService hrService, I18nService i18n)
+public class CertificateHandler(IHrService hrService, I18nService i18n)
 {
     public Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {

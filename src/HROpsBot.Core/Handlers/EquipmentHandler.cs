@@ -1,12 +1,13 @@
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Services;
 using HROpsBot.Domain.Entities;
-using HROpsBot.MockAPI;
+using HROpsBot.Core.Interfaces;
+using HROpsBot.Core.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HROpsBot.Core.Handlers;
 
-public class EquipmentHandler(MockEquipmentService equipmentService, I18nService i18n)
+public class EquipmentHandler(IEquipmentService equipmentService, I18nService i18n)
 {
     public Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
@@ -54,7 +55,7 @@ public class EquipmentHandler(MockEquipmentService equipmentService, I18nService
         };
 
         var req = await equipmentService.CreateRequestAsync(state.EmployeeId.Value, type);
-        var (nameRu, nameKk) = MockEquipmentService.GetTypeName(type);
+        var (nameRu, nameKk) = FormatHelper.GetEquipmentTypeName(type);
 
         var text = $"✅ Заявка создана! / Өтінім жасалды!\n\n" +
                    $"💻 *{nameRu}* / *{nameKk}*\n" +

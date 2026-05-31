@@ -1,11 +1,12 @@
 using HROpsBot.Core.Dialog;
 using HROpsBot.Core.Services;
-using HROpsBot.MockAPI;
+using HROpsBot.Core.Interfaces;
+using HROpsBot.Core.Helpers;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace HROpsBot.Core.Handlers;
 
-public class TaskHandler(MockTaskService taskService, I18nService i18n)
+public class TaskHandler(ITaskService taskService, I18nService i18n)
 {
     public async Task<BotResponse> HandleListAsync(ConversationState state)
     {
@@ -34,7 +35,7 @@ public class TaskHandler(MockTaskService taskService, I18nService i18n)
         foreach (var task in tasks.Take(5))
         {
             var icon = task.IsOverdue ? "🔴" : task.Status == Domain.Entities.TaskItemStatus.InProgress ? "⚙️" : "📋";
-            var (priorityRu, priorityKk) = MockTaskService.GetPriorityLabel(task.Priority);
+            var (priorityRu, priorityKk) = FormatHelper.GetTaskPriorityLabel(task.Priority);
             var deadline = task.Deadline.HasValue
                 ? task.Deadline.Value.ToString("dd.MM HH:mm")
                 : "—";

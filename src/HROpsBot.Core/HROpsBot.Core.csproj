@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HROpsBot.Domain\HROpsBot.Domain.csproj" />
-    <ProjectReference Include="..\HROpsBot.MockAPI\HROpsBot.MockAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

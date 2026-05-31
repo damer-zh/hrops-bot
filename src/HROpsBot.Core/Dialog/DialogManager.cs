@@ -1,7 +1,8 @@
 using HROpsBot.Core.Handlers;
 using HROpsBot.Core.NLU;
 using HROpsBot.Core.Services;
-using HROpsBot.MockAPI;
+using HROpsBot.Core.Interfaces;
+using HROpsBot.Core.Helpers;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -17,7 +18,7 @@ public class DialogManager(
     AppointmentHandler appointmentHandler,
     FaqHandler faqHandler,
     CsatService csatService,
-    MockHRService hrService,
+    IHrService hrService,
     I18nService i18n,
     Microsoft.Extensions.Configuration.IConfiguration config,
     ILogger<DialogManager> logger)

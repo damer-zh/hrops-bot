@@ -21,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\HROpsBot.Core\HROpsBot.Core.csproj" />
     <ProjectReference Include="..\HROpsBot.Infrastructure\HROpsBot.Infrastructure.csproj" />
-    <ProjectReference Include="..\HROpsBot.MockAPI\HROpsBot.MockAPI.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,13 +11,6 @@ interface ServiceActionsProps {
 
 type ModalId = 'cert' | 'equip' | 'reg' | 'hr' | 'faq' | 'it' | 'vacation' | null;
 
-const CERT_TYPE_MAP: Record<string, string> = {
-  '0': 'С места работы',
-  '1': 'О доходах',
-  '2': 'ИПН/КПН',
-  '3': 'Стаж',
-};
-
 export const ServiceActions: React.FC<ServiceActionsProps> = ({ employeeId, vacationBalance, onRequestCreated }) => {
   const [activeModal, setActiveModal] = useState<ModalId>(null);
   const [certType, setCertType] = useState('0');

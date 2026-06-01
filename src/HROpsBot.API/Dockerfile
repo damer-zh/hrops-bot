@@ -9,7 +9,6 @@ COPY ["src/HROpsBot.API/HROpsBot.API.csproj", "src/HROpsBot.API/"]
 COPY ["src/HROpsBot.Core/HROpsBot.Core.csproj", "src/HROpsBot.Core/"]
 COPY ["src/HROpsBot.Domain/HROpsBot.Domain.csproj", "src/HROpsBot.Domain/"]
 COPY ["src/HROpsBot.Infrastructure/HROpsBot.Infrastructure.csproj", "src/HROpsBot.Infrastructure/"]
-COPY ["src/HROpsBot.MockAPI/HROpsBot.MockAPI.csproj", "src/HROpsBot.MockAPI/"]
 
 RUN dotnet restore "src/HROpsBot.API/HROpsBot.API.csproj"
 

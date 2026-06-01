@@ -25,14 +25,49 @@ const VAC_STATUS_BADGE: Record<string, { cls: string; label: string }> = {
 
 export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ employeeId, employeeName, isNewEmployee }) => {
   const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadData = useCallback(() => {
-    api.get(`/tma/dashboard/${employeeId}`).then(res => setData(res.data)).catch(console.error);
+    setLoading(true);
+    setError(null);
+    api.get(`/tma/dashboard/${employeeId}`)
+      .then(res => {
+        setData(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error(err);
+        setError(err.response?.data?.message || err.message || 'Ошибка загрузки дашборда');
+        setLoading(false);
+      });
   }, [employeeId]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  if (!data) return <div className="flex-center" style={{ height: '50vh' }}><div className="spinner" /></div>;
+  if (loading) {
+    return (
+      <div className="flex-center" style={{ height: '50vh', flexDirection: 'column', gap: '12px' }}>
+        <div className="spinner" />
+        <div className="text-subtitle" style={{ fontSize: '0.88rem' }}>Загружаем панель сотрудника...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="glass-card animate-fade-in" style={{ padding: '24px', textAlign: 'center', margin: '16px auto', maxWidth: '360px' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>⚠️</div>
+        <h3 style={{ color: '#dc2626', marginBottom: '8px', fontWeight: 600 }}>Не удалось загрузить данные</h3>
+        <p className="text-subtitle" style={{ fontSize: '0.82rem', marginBottom: '18px', color: 'var(--text-secondary)' }}>{error}</p>
+        <button className="btn-primary" onClick={loadData} style={{ padding: '10px 20px', fontSize: '0.85rem' }}>
+          🔄 Повторить попытку
+        </button>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   const { vacation, tasks, equipment, vacations, itRequests } = data;
   const overdueTasks = tasks.filter((t: any) => t.isOverdue).length;

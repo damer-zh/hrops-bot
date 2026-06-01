@@ -99,8 +99,48 @@ app.MapHub<HROpsBot.API.Hubs.NotificationHub>("/notifications");
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // Применяем миграции / создаём таблицы
+    // Сначала пытаемся создать БД и основные таблицы, если БД не существовала вообще
     await db.Database.EnsureCreatedAsync();
+
+    // Если БД уже существовала, EnsureCreatedAsync не создаст новые таблицы (например, ItRequests или OnboardingProgresses).
+    // Поэтому принудительно прогоняем скрипт создания таблиц с IF NOT EXISTS.
+    try
+    {
+        var script = db.Database.GenerateCreateScript();
+        var statements = script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var statement in statements)
+        {
+            var cleanStatement = statement.Trim();
+            if (string.IsNullOrWhiteSpace(cleanStatement)) continue;
+
+            if (cleanStatement.StartsWith("CREATE TABLE", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanStatement = cleanStatement.Replace("CREATE TABLE \"", "CREATE TABLE IF NOT EXISTS \"");
+            }
+            else if (cleanStatement.StartsWith("CREATE INDEX", StringComparison.OrdinalIgnoreCase) ||
+                     cleanStatement.StartsWith("CREATE UNIQUE INDEX", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanStatement = cleanStatement.Replace("CREATE INDEX \"", "CREATE INDEX IF NOT EXISTS \"")
+                                               .Replace("CREATE UNIQUE INDEX \"", "CREATE UNIQUE INDEX IF NOT EXISTS \"");
+            }
+
+            try
+            {
+                await db.Database.ExecuteSqlRawAsync(cleanStatement);
+            }
+            catch (Exception ex)
+            {
+                // Игнорируем ошибки вроде "relation already exists" или дублирования ограничений,
+                // так как это ожидаемо для уже существующих таблиц.
+                app.Logger.LogDebug("DB Init Statement: {Message}", ex.Message);
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "Ошибка при автоматической миграции схемы БД");
+    }
+
     await SeedData.SeedAsync(db);
 }
 

@@ -51,12 +51,33 @@ public class GeminiNluClient(
             };
 
             var json = JsonSerializer.Serialize(requestBody);
-            using var content = new StringContent(json, Encoding.UTF8, "application/json");
-            using var response = await httpClient.PostAsync(url, content, ct);
+            HttpResponseMessage? response = null;
+            int maxRetries = 3;
 
-            if (!response.IsSuccessStatusCode)
+            for (int i = 0; i < maxRetries; i++)
             {
+                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+                response = await httpClient.PostAsync(url, content, ct);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    break;
+                }
+
+                if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    logger.LogWarning("Gemini API error: TooManyRequests. Retrying {Attempt}/{MaxRetries} after delay...", i + 1, maxRetries);
+                    await Task.Delay(TimeSpan.FromSeconds(2 * (i + 1)), ct);
+                    continue; // try again
+                }
+
                 logger.LogWarning("Gemini API error: {StatusCode}", response.StatusCode);
+                return fallback;
+            }
+
+            if (response == null || !response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("Gemini API error: Retries exhausted or failed. Final Status: {StatusCode}", response?.StatusCode);
                 return fallback;
             }
 

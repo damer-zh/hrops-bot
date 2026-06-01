@@ -75,7 +75,7 @@ export const App: React.FC = () => {
   }
 
   // ---------- ONBOARDING (profile setup) ----------
-  if (!employee.department) {
+  if (!employee.department || employee.department.trim() === '') {
     return <OnboardingForm employeeId={employee.id} onComplete={() => window.location.reload()} />;
   }
 

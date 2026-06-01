@@ -274,6 +274,7 @@ public class TmaController(
         var vacations   = await hrService.GetPendingVacationRequestsAsync();
         var certs       = await hrService.GetPendingCertificateRequestsAsync();
         var itRequests  = await itRequestService.GetPendingItRequestsAsync();
+        var equipment   = await equipmentService.GetPendingRequestsAsync();
 
         return Ok(new
         {
@@ -291,6 +292,11 @@ public class TmaController(
             {
                 r.Id, r.Type, r.SystemName, r.Description, r.Status, r.Priority, r.CreatedAt,
                 employee = new { r.Employee.Id, r.Employee.NameRu, r.Employee.Department }
+            }),
+            equipment = equipment.Select(e => new
+            {
+                e.Id, e.Type, e.DescriptionRu, e.Status, e.TicketNumber, e.CreatedAt,
+                employee = new { e.Employee.Id, e.Employee.NameRu, e.Employee.Department }
             })
         });
     }
@@ -322,6 +328,20 @@ public class TmaController(
     public async Task<IActionResult> RejectCertificate(int id)
     {
         var ok = await hrService.RejectCertificateAsync(id);
+        return ok ? Ok(new { success = true }) : NotFound();
+    }
+
+    [HttpPost("admin/equipment/{id:int}/approve")]
+    public async Task<IActionResult> ApproveEquipment(int id)
+    {
+        var ok = await equipmentService.UpdateStatusAsync(id, RequestStatus.InProgress);
+        return ok ? Ok(new { success = true }) : NotFound();
+    }
+
+    [HttpPost("admin/equipment/{id:int}/reject")]
+    public async Task<IActionResult> RejectEquipment(int id)
+    {
+        var ok = await equipmentService.UpdateStatusAsync(id, RequestStatus.Rejected);
         return ok ? Ok(new { success = true }) : NotFound();
     }
 

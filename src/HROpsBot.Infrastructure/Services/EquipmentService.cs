@@ -44,4 +44,22 @@ public class EquipmentService(AppDbContext dbContext) : IEquipmentService
 
     public async Task<List<EquipmentRequest>> GetEmployeeRequestsAsync(int employeeId) =>
         await dbContext.EquipmentRequests.Where(r => r.EmployeeId == employeeId).ToListAsync();
+
+    public async Task<List<EquipmentRequest>> GetPendingRequestsAsync() =>
+        await dbContext.EquipmentRequests
+            .Include(r => r.Employee)
+            .Where(r => r.Status == RequestStatus.Pending || r.Status == RequestStatus.InProgress)
+            .OrderByDescending(r => r.CreatedAt)
+            .ToListAsync();
+
+    public async Task<bool> UpdateStatusAsync(int id, RequestStatus status)
+    {
+        var req = await dbContext.EquipmentRequests.FindAsync(id);
+        if (req == null) return false;
+        req.Status = status;
+        if (status is RequestStatus.Ready or RequestStatus.Delivered or RequestStatus.Rejected)
+            req.ResolvedAt = DateTime.UtcNow;
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
 }

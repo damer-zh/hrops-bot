@@ -122,7 +122,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ employeeId
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500, fontSize: '0.88rem' }}>Заявка {e.ticketNumber}</div>
                 <div className="text-subtitle" style={{ fontSize: '0.78rem' }}>
-                  {['', 'Ноутбук', 'Монитор', 'Клавиатура', 'Мышь', 'Гарнитура'][e.type] ?? 'Оборудование'}
+                  {['Ноутбук', 'Монитор', 'Клавиатура', 'Мышь', 'Гарнитура', 'Телефон', 'Кресло', 'Стол'][e.type] ?? 'Оборудование'}
                 </div>
               </div>
               <span className="badge warning">В обработке</span>

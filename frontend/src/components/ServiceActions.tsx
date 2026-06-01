@@ -102,16 +102,12 @@ export const ServiceActions: React.FC<ServiceActionsProps> = ({ employeeId, vaca
     <div>
       <div className="section-label" style={{ marginBottom: '10px' }}>Действия</div>
       <div className="grid-cols-3" style={{ gap: '10px' }}>
-        {actionButtons.slice(0, 6).map(btn => (
+        {actionButtons.map(btn => (
           <button key={btn.id} className="action-btn" onClick={() => { setActiveModal(btn.id); setMessage(null); }}>
             <span className="action-icon">{btn.icon}</span>
             <span className="action-label">{btn.label}</span>
           </button>
         ))}
-        <button key="faq" className="action-btn" onClick={() => { setActiveModal('faq'); setMessage(null); }}>
-          <span className="action-icon">❓</span>
-          <span className="action-label">FAQ</span>
-        </button>
       </div>
 
       {/* ===== BOTTOM SHEET MODAL ===== */}
@@ -188,7 +184,7 @@ export const ServiceActions: React.FC<ServiceActionsProps> = ({ employeeId, vaca
                   <div>
                     <div className="section-label">Тип оборудования</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                      {[['1','💻 Ноутбук'],['2','🖥 Монитор'],['3','⌨️ Клавиатура'],['4','🖱 Мышь'],['5','🎧 Гарнитура'],['6','📱 Телефон']].map(([v,l]) => (
+                      {[['0','💻 Ноутбук'],['1','🖥 Монитор'],['2','⌨️ Клавиатура'],['3','🖱 Мышь'],['4','🎧 Гарнитура'],['5','📱 Телефон']].map(([v,l]) => (
                         <button key={v} onClick={() => setEquipType(v)}
                           style={{
                             padding: '10px', borderRadius: 'var(--radius-sm)',

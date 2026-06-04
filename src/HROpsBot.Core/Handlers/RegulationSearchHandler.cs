@@ -8,7 +8,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class RegulationSearchHandler(IDocService docService, I18nService i18n)
 {
-    public Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         // Если уже есть текст в запросе — ищем сразу
         if (!string.IsNullOrWhiteSpace(userText) && userText.Length > 3 &&
@@ -24,7 +24,7 @@ public class RegulationSearchHandler(IDocService docService, I18nService i18n)
         return Task.FromResult(BotResponse.Create(i18n.Get("regulation.ask_query")));
     }
 
-    public Task<BotResponse> HandleQueryAsync(ConversationState state, string query)
+    public virtual Task<BotResponse> HandleQueryAsync(ConversationState state, string query)
     {
         state.Set("reg_query", query);
         return SearchAndRespond(state, query);
@@ -70,7 +70,7 @@ public class RegulationSearchHandler(IDocService docService, I18nService i18n)
         return BotResponse.Create(sb.ToString(), new InlineKeyboardMarkup(buttons));
     }
 
-    public async Task<BotResponse> HandleOpenDocAsync(ConversationState state, int docId)
+    public virtual async Task<BotResponse> HandleOpenDocAsync(ConversationState state, int docId)
     {
         var reg = await docService.GetByIdAsync(docId);
         if (reg == null) return BotResponse.Create(i18n.Get("error.general"));

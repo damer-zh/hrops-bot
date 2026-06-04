@@ -8,6 +8,7 @@ public class CertificateRequest
     public CertificateType Type { get; set; }
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
     public string? DeliveryMethod { get; set; } // "email" | "paper"
+    public string? RejectionReason { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ReadyAt { get; set; }
     public DateTime EstimatedReadyAt => CreatedAt.AddBusinessDays(3);

@@ -8,7 +8,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class AppointmentHandler(IHrService hrService, I18nService i18n)
 {
-    public async Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual async Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         state.CurrentStep = DialogStep.WaitingAppointmentSlot;
 
@@ -28,7 +28,7 @@ public class AppointmentHandler(IHrService hrService, I18nService i18n)
         return BotResponse.Create(text, new InlineKeyboardMarkup(buttons));
     }
 
-    public async Task<BotResponse> HandleSlotSelectedAsync(ConversationState state, string callbackData)
+    public virtual async Task<BotResponse> HandleSlotSelectedAsync(ConversationState state, string callbackData)
     {
         if (state.EmployeeId == null) return BotResponse.Create(i18n.Get("fallback"));
 

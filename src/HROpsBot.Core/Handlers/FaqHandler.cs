@@ -34,7 +34,7 @@ public class FaqHandler(I18nService i18n)
         )
     ];
 
-    public Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         var lowerText = userText.ToLower();
 
@@ -71,7 +71,7 @@ public class FaqHandler(I18nService i18n)
         return Task.FromResult(BotResponse.Create(responseText, keyboard));
     }
 
-    public Task<BotResponse> HandleFaqItemAsync(ConversationState state, string item)
+    public virtual Task<BotResponse> HandleFaqItemAsync(ConversationState state, string item)
     {
         var index = item switch
         {

@@ -8,7 +8,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class TaskHandler(ITaskService taskService, I18nService i18n)
 {
-    public async Task<BotResponse> HandleListAsync(ConversationState state)
+    public virtual async Task<BotResponse> HandleListAsync(ConversationState state)
     {
         if (state.EmployeeId == null) return BotResponse.Create(i18n.Get("fallback"));
 
@@ -57,7 +57,7 @@ public class TaskHandler(ITaskService taskService, I18nService i18n)
         ]]));
     }
 
-    public async Task<BotResponse> HandleOverdueAsync(ConversationState state)
+    public virtual async Task<BotResponse> HandleOverdueAsync(ConversationState state)
     {
         if (state.EmployeeId == null) return BotResponse.Create(i18n.Get("fallback"));
 

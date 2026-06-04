@@ -81,6 +81,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasOne(x => x.Employee).WithMany(x => x.CertificateRequests)
                 .HasForeignKey(x => x.EmployeeId);
             e.Ignore(x => x.EstimatedReadyAt);
+            e.Property(x => x.RejectionReason).HasMaxLength(500);
         });
 
         modelBuilder.Entity<EquipmentRequest>(e =>
@@ -88,6 +89,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasKey(x => x.Id);
             e.HasOne(x => x.Employee).WithMany(x => x.EquipmentRequests)
                 .HasForeignKey(x => x.EmployeeId);
+            e.Property(x => x.RejectionReason).HasMaxLength(500);
         });
 
         modelBuilder.Entity<TaskItem>(e =>

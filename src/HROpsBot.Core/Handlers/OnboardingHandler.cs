@@ -6,7 +6,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class OnboardingHandler(IHrService hrService, I18nService i18n)
 {
-    public BotResponse StartOnboarding(ConversationState state)
+    public virtual BotResponse StartOnboarding(ConversationState state)
     {
         state.CurrentStep = DialogStep.WaitingOnboardingDepartment;
         return BotResponse.Create(
@@ -15,7 +15,7 @@ public class OnboardingHandler(IHrService hrService, I18nService i18n)
         );
     }
 
-    public async Task<BotResponse> HandleDepartmentAsync(ConversationState state, string text)
+    public virtual async Task<BotResponse> HandleDepartmentAsync(ConversationState state, string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return BotResponse.Create("Название отдела не может быть пустым. Пожалуйста, введите ваш отдел:", null);
@@ -29,7 +29,7 @@ public class OnboardingHandler(IHrService hrService, I18nService i18n)
         );
     }
 
-    public async Task<BotResponse> HandlePositionAsync(ConversationState state, string text)
+    public virtual async Task<BotResponse> HandlePositionAsync(ConversationState state, string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return BotResponse.Create("Должность не может быть пустой. Пожалуйста, введите вашу должность:", null);

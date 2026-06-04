@@ -8,7 +8,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class VacationHandler(IHrService hrService, I18nService i18n)
 {
-    public async Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual async Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         if (state.EmployeeId == null)
             return BotResponse.Create(i18n.Get("fallback"));

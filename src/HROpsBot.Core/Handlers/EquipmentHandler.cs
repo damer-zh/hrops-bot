@@ -9,7 +9,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class EquipmentHandler(IEquipmentService equipmentService, I18nService i18n)
 {
-    public Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         state.CurrentStep = DialogStep.WaitingEquipmentType;
         var text = i18n.Get("equipment.choose_type");
@@ -38,7 +38,7 @@ public class EquipmentHandler(IEquipmentService equipmentService, I18nService i1
         return Task.FromResult(BotResponse.Create(text, keyboard));
     }
 
-    public async Task<BotResponse> HandleTypeSelectedAsync(ConversationState state, string callbackData)
+    public virtual async Task<BotResponse> HandleTypeSelectedAsync(ConversationState state, string callbackData)
     {
         if (state.EmployeeId == null) return BotResponse.Create(i18n.Get("fallback"));
 

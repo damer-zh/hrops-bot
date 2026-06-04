@@ -9,6 +9,7 @@ public class EquipmentRequest
     public string DescriptionRu { get; set; } = string.Empty;
     public string DescriptionKk { get; set; } = string.Empty;
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
+    public string? RejectionReason { get; set; }
     public string? TicketNumber { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ResolvedAt { get; set; }

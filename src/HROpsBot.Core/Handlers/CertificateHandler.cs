@@ -9,7 +9,7 @@ namespace HROpsBot.Core.Handlers;
 
 public class CertificateHandler(IHrService hrService, I18nService i18n)
 {
-    public Task<BotResponse> HandleAsync(ConversationState state, string userText)
+    public virtual Task<BotResponse> HandleAsync(ConversationState state, string userText)
     {
         // Шаг 1: показываем выбор типа справки
         state.CurrentStep = DialogStep.WaitingCertificateType;
@@ -31,7 +31,7 @@ public class CertificateHandler(IHrService hrService, I18nService i18n)
         return Task.FromResult(BotResponse.Create(text, keyboard));
     }
 
-    public async Task<BotResponse> HandleTypeSelectedAsync(ConversationState state, string callbackData)
+    public virtual async Task<BotResponse> HandleTypeSelectedAsync(ConversationState state, string callbackData)
     {
         var type = callbackData switch
         {
@@ -69,7 +69,7 @@ public class CertificateHandler(IHrService hrService, I18nService i18n)
         return await Task.FromResult(BotResponse.Create(text, keyboard));
     }
 
-    public async Task<BotResponse> HandleDeliverySelectedAsync(ConversationState state, string callbackData)
+    public virtual async Task<BotResponse> HandleDeliverySelectedAsync(ConversationState state, string callbackData)
     {
         if (state.EmployeeId == null) return BotResponse.Create(i18n.Get("fallback"));
 

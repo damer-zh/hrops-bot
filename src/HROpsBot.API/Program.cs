@@ -9,6 +9,7 @@ using HROpsBot.Infrastructure.Persistence;
 using HROpsBot.Infrastructure.Services;
 using HROpsBot.Infrastructure.Telegram;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -76,7 +77,22 @@ builder.Services.AddHostedService<TaskPollingService>();
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "HROpsBot API",
+        Version = "v1",
+        Description = "REST API для Telegram Mini App HROpsBot — автоматизация HR-процессов: " +
+                      "онбординг, отпуска, справки, IT-заявки, оборудование.",
+        Contact = new OpenApiContact { Name = "HROpsBot Team" }
+    });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+        opt.IncludeXmlComments(xmlPath);
+});
 
 // ---- CORS (для TMA) ----
 builder.Services.AddCors(opt => opt.AddDefaultPolicy(p =>
@@ -86,11 +102,13 @@ var app = builder.Build();
 
 // ---- Middleware ----
 app.UseCors();
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(opt =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    opt.SwaggerEndpoint("/swagger/v1/swagger.json", "HROpsBot API v1");
+    opt.RoutePrefix = "swagger";
+    opt.DocumentTitle = "HROpsBot API Docs";
+});
 
 app.MapControllers();
 app.MapHub<HROpsBot.API.Hubs.NotificationHub>("/notifications");

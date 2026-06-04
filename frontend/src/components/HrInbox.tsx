@@ -84,32 +84,25 @@ export const HrInbox: React.FC<HrInboxProps> = ({ onCountChange }) => {
     };
 
     const reject = async (type: string, id: number) => {
-+        // Для отпуска и IT-заявок требуется причина, для справок и оборудования опционально
-+        const needsReason = type === "vacation" || type === "it";
--        const reason = window
--            .prompt("Укажите причину отказа")
--            ?.trim();
--        if (!reason) {
-+        let reason: string | null = null;
-+        if (needsReason) {
-+            reason = window
-+                .prompt("Укажите причину отказа")
-+                ?.trim();
-+            if (!reason) {
--            if (window.Telegram?.WebApp) {
--                window.Telegram.WebApp.showAlert("Причина отказа обязательна");
--            }
--            return;
-+                if (window.Telegram?.WebApp) {
-+                    window.Telegram.WebApp.showAlert("Причина отказа обязательна");
-+                }
-+                return;
-+            }
-+        } else {
-+            // Для справок и оборудования предложить опционально
-+            reason = window.prompt(
-+                "Укажите причину отказа (опционально)"
-+            );
+        // Для отпуска и IT-заявок требуется причина, для справок и оборудования опционально
+        const needsReason = type === "vacation" || type === "it";
+        let reason: string | null = null;
+        if (needsReason) {
+            reason = window
+                .prompt("Укажите причину отказа")
+                ?.trim() ?? null;
+            if (!reason) {
+                if (window.Telegram?.WebApp) {
+                    window.Telegram.WebApp.showAlert("Причина отказа обязательна");
+                }
+                return;
+            }
+        } else {
+            // Для справок и оборудования предложить опционально
+            reason = window.prompt(
+                "Укажите причину отказа (опционально)"
+            );
+        }
 
         setProcessing(`${type}-reject-${id}`);
         try {

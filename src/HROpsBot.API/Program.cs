@@ -90,7 +90,7 @@ builder.Services.AddSwaggerGen(opt =>
 
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
+    if (System.IO.File.Exists(xmlPath))
         opt.IncludeXmlComments(xmlPath);
 });
 

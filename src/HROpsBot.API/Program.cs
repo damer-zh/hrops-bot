@@ -153,6 +153,12 @@ using (var scope = app.Services.CreateScope())
                 app.Logger.LogDebug("DB Init Statement: {Message}", ex.Message);
             }
         }
+
+        // Ensure new nullable columns exist in already-initialized databases.
+        await db.Database.ExecuteSqlRawAsync(
+            "ALTER TABLE \"CertificateRequests\" ADD COLUMN IF NOT EXISTS \"RejectionReason\" character varying(500)");
+        await db.Database.ExecuteSqlRawAsync(
+            "ALTER TABLE \"EquipmentRequests\" ADD COLUMN IF NOT EXISTS \"RejectionReason\" character varying(500)");
     }
     catch (Exception ex)
     {

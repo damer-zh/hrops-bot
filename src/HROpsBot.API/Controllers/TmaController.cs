@@ -176,6 +176,7 @@ public class TmaController(
     public async Task<IActionResult> RequestCertificate([FromBody] CertificateReq req)
     {
         var result = await hrService.CreateCertificateRequestAsync(req.EmployeeId, req.Type, req.DeliveryMethod);
+        await NotifyHrAdminsAsync("certificate", result.Id, result.EmployeeId, "Новая заявка на справку");
         return Ok(result);
     }
 
@@ -196,6 +197,7 @@ public class TmaController(
     public async Task<IActionResult> RequestEquipment([FromBody] EquipmentReq req)
     {
         var result = await equipmentService.CreateRequestAsync(req.EmployeeId, req.Type);
+        await NotifyHrAdminsAsync("equipment", result.Id, result.EmployeeId, "Новая заявка на оборудование");
         return Ok(result);
     }
 
@@ -221,6 +223,7 @@ public class TmaController(
             return BadRequest(new { error = "Дата окончания должна быть позже даты начала" });
 
         var result = await hrService.CreateVacationRequestAsync(req.EmployeeId, req.StartDate, req.EndDate);
+        await NotifyHrAdminsAsync("vacation", result.Id, result.EmployeeId, "Новая заявка на отпуск");
         return Ok(new { result.Id, result.StartDate, result.EndDate, result.DaysCount, result.Status });
     }
 
@@ -244,6 +247,7 @@ public class TmaController(
     public async Task<IActionResult> CreateItRequest([FromBody] ItReq req)
     {
         var result = await itRequestService.CreateItRequestAsync(req.EmployeeId, req.Type, req.SystemName, req.Description, req.Priority);
+        await NotifyHrAdminsAsync("it", result.Id, result.EmployeeId, "Новая IT-заявка");
         return Ok(new { result.Id, result.Type, result.SystemName, result.Status, result.CreatedAt });
     }
 
@@ -642,6 +646,23 @@ public class TmaController(
             status,
             message,
             reason,
+            changedAt = DateTime.UtcNow
+        });
+    }
+
+    private Task NotifyHrAdminsAsync(
+        string requestType,
+        int requestId,
+        int employeeId,
+        string message)
+    {
+        return hubContext.Clients.Group("hr_admins").SendAsync("ReceiveNotification", new
+        {
+            requestType,
+            requestId,
+            employeeId,
+            status = "Pending",
+            message,
             changedAt = DateTime.UtcNow
         });
     }

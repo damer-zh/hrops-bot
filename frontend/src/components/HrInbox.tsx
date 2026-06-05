@@ -88,9 +88,8 @@ export const HrInbox: React.FC<HrInboxProps> = ({ onCountChange }) => {
         const needsReason = type === "vacation" || type === "it";
         let reason: string | null = null;
         if (needsReason) {
-            reason = window
-                .prompt("Укажите причину отказа")
-                ?.trim() ?? null;
+            const promptResult = window.prompt("Укажите причину отказа");
+            reason = promptResult ? promptResult.trim() : null;
             if (!reason) {
                 if (window.Telegram?.WebApp) {
                     window.Telegram.WebApp.showAlert("Причина отказа обязательна");
@@ -99,9 +98,10 @@ export const HrInbox: React.FC<HrInboxProps> = ({ onCountChange }) => {
             }
         } else {
             // Для справок и оборудования предложить опционально
-            reason = window.prompt(
+            const promptResult = window.prompt(
                 "Укажите причину отказа (опционально)"
             );
+            reason = promptResult ? promptResult.trim() : null;
         }
 
         setProcessing(`${type}-reject-${id}`);

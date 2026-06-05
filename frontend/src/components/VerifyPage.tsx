@@ -41,6 +41,7 @@ const Confetti: React.FC<{ count?: number }> = ({ count = 50 }) => {
 
 interface VerifyPageProps {
     token: string;
+    onClose?: () => void;
 }
 
 interface EmployeeData {
@@ -60,7 +61,7 @@ interface VerifyResult {
     error?: string;
 }
 
-export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
+export const VerifyPage: React.FC<VerifyPageProps> = ({ token, onClose }) => {
     const [result, setResult] = useState<VerifyResult | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -87,10 +88,14 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
     if (loading) {
         return (
             <div style={{
-                minHeight: "100dvh", display: "flex", flexDirection: "column",
+                position: "fixed", inset: 0,
+                display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center",
                 background: "#0f172a", color: "#fff",
             }}>
+                {onClose && (
+                    <button onClick={onClose} style={backBtnStyle}>← Назад</button>
+                )}
                 <div style={{
                     width: 56, height: 56,
                     border: "4px solid rgba(255,255,255,0.2)",
@@ -112,12 +117,15 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
     if (!valid) {
         return (
             <div style={{
-                minHeight: "100dvh",
+                position: "fixed", inset: 0,
                 background: "linear-gradient(160deg, #7f1d1d 0%, #450a0a 60%, #0f172a 100%)",
                 display: "flex", flexDirection: "column",
                 alignItems: "center", justifyContent: "center",
-                padding: 24, textAlign: "center", position: "relative",
+                padding: 24, textAlign: "center", overflowY: "auto",
             }}>
+                {onClose && (
+                    <button onClick={onClose} style={backBtnStyle}>← Назад</button>
+                )}
                 <style>{`@keyframes pulse-red { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 50% { box-shadow: 0 0 0 30px rgba(239,68,68,0); } }`}</style>
                 <div style={{
                     width: 140, height: 140, borderRadius: "50%",
@@ -172,13 +180,15 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
 
     return (
         <div style={{
-            minHeight: "100dvh",
+            position: "fixed", inset: 0,
             background: "linear-gradient(160deg, #0f4c81 0%, #0a3660 40%, #051e3e 100%)",
             padding: "24px 16px",
             color: "#fff",
-            overflow: "hidden",
-            position: "relative",
+            overflowY: "auto",
         }}>
+            {onClose && (
+                <button onClick={onClose} style={backBtnStyle}>← Назад</button>
+            )}
             <style>{`
                 @keyframes slide-up { from { opacity:0; transform:translateY(60px); } to { opacity:1; transform:none; } }
                 @keyframes scan-line { 0% { top: -100%; opacity: 1; } 100% { top: 100%; opacity: 0; } }
@@ -317,8 +327,11 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
                 {/* Scan button for next pass */}
                 <button
                     onClick={() => {
-                        // Закроем текущую проверку и вернемся на главную с возможностью отсканировать новый QR
-                        window.location.href = "/?scan=true";
+                        if (onClose) {
+                            onClose();
+                        } else {
+                            window.location.href = "/?scan=true";
+                        }
                     }}
                     style={{
                         width: "100%",
@@ -365,6 +378,23 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
 };
 
 /* ──────────────────────────── Helpers ────────────────────────────── */
+
+const backBtnStyle: React.CSSProperties = {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.25)",
+    color: "rgba(255,255,255,0.9)",
+    borderRadius: 12,
+    padding: "8px 16px",
+    fontSize: "0.85rem",
+    fontWeight: 600,
+    cursor: "pointer",
+    zIndex: 10,
+    backdropFilter: "blur(8px)",
+    transition: "all 0.2s",
+};
 
 const InfoCard: React.FC<{ icon: string; label: string; value: string; accent?: string }> = ({ icon, label, value }) => (
     <div style={{

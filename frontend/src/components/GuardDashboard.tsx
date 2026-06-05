@@ -15,6 +15,10 @@ export const GuardDashboard: React.FC<GuardDashboardProps> = ({ guardName, onSwi
         return (
             <VerifyPage
                 token={verifyToken}
+                onClose={() => {
+                    setVerifyToken(null);
+                    setScanning(true);
+                }}
             />
         );
     }
@@ -22,7 +26,17 @@ export const GuardDashboard: React.FC<GuardDashboardProps> = ({ guardName, onSwi
     if (scanning) {
         return (
             <ScanQR
-                onTokenFound={(token) => {
+                onTokenFound={(raw) => {
+                    // QR может содержать полный URL вида https://.../?verify=TOKEN
+                    // или просто сырой токен — извлекаем нужную часть
+                    let token = raw;
+                    try {
+                        const url = new URL(raw);
+                        const fromParam = url.searchParams.get("verify");
+                        if (fromParam) token = fromParam;
+                    } catch {
+                        // не URL — используем как есть
+                    }
                     setScanning(false);
                     setVerifyToken(token);
                 }}

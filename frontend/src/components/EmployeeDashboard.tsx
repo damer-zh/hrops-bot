@@ -207,33 +207,49 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                                 <div
                                     key={v.id}
                                     className="list-item"
-                                    style={{ padding: "8px 0" }}
+                                    style={{ padding: "8px 0", flexDirection: "column", alignItems: "flex-start", gap: 4 }}
                                 >
-                                    <div style={{ flex: 1 }}>
-                                        <div
-                                            style={{
-                                                fontSize: "0.85rem",
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {new Date(
-                                                v.startDate,
-                                            ).toLocaleDateString("ru-RU")}{" "}
-                                            —{" "}
-                                            {new Date(
-                                                v.endDate,
-                                            ).toLocaleDateString("ru-RU")}
+                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div
+                                                style={{
+                                                    fontSize: "0.85rem",
+                                                    fontWeight: 500,
+                                                }}
+                                            >
+                                                {new Date(
+                                                    v.startDate,
+                                                ).toLocaleDateString("ru-RU")}{" "}
+                                                —{" "}
+                                                {new Date(
+                                                    v.endDate,
+                                                ).toLocaleDateString("ru-RU")}
+                                            </div>
+                                            <div
+                                                className="text-subtitle"
+                                                style={{ fontSize: "0.78rem" }}
+                                            >
+                                                {v.daysCount} дней
+                                            </div>
                                         </div>
-                                        <div
-                                            className="text-subtitle"
-                                            style={{ fontSize: "0.78rem" }}
-                                        >
-                                            {v.daysCount} дней
-                                        </div>
+                                        <span className={`badge ${st.cls}`}>
+                                            {st.label}
+                                        </span>
                                     </div>
-                                    <span className={`badge ${st.cls}`}>
-                                        {st.label}
-                                    </span>
+                                    {v.status === "Rejected" && v.reason && (
+                                        <div style={{
+                                            fontSize: "0.75rem",
+                                            color: "#dc2626",
+                                            fontStyle: "italic",
+                                            background: "#fee2e2",
+                                            border: "1px solid #fca5a5",
+                                            borderRadius: 8,
+                                            padding: "4px 10px",
+                                            width: "100%",
+                                        }}>
+                                            ❌ Причина: {v.reason}
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -357,26 +373,42 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                             label: "Неизвестно",
                         };
                         return (
-                            <div key={r.id} className="list-item">
-                                <div style={{ flex: 1 }}>
-                                    <div
-                                        style={{
-                                            fontWeight: 500,
-                                            fontSize: "0.88rem",
-                                        }}
-                                    >
-                                        {r.systemName}
+                            <div key={r.id} className="list-item" style={{ flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                    <div style={{ flex: 1 }}>
+                                        <div
+                                            style={{
+                                                fontWeight: 500,
+                                                fontSize: "0.88rem",
+                                            }}
+                                        >
+                                            {r.systemName}
+                                        </div>
+                                        <div
+                                            className="text-subtitle"
+                                            style={{ fontSize: "0.78rem" }}
+                                        >
+                                            {IT_TYPE_LABEL[r.type] ?? "IT"}
+                                        </div>
                                     </div>
-                                    <div
-                                        className="text-subtitle"
-                                        style={{ fontSize: "0.78rem" }}
-                                    >
-                                        {IT_TYPE_LABEL[r.type] ?? "IT"}
-                                    </div>
+                                    <span className={`badge ${st.cls}`}>
+                                        {st.label}
+                                    </span>
                                 </div>
-                                <span className={`badge ${st.cls}`}>
-                                    {st.label}
-                                </span>
+                                {r.status === 4 && r.reason && (
+                                    <div style={{
+                                        fontSize: "0.75rem",
+                                        color: "#dc2626",
+                                        fontStyle: "italic",
+                                        background: "#fee2e2",
+                                        border: "1px solid #fca5a5",
+                                        borderRadius: 8,
+                                        padding: "4px 10px",
+                                        width: "100%",
+                                    }}>
+                                        ❌ Причина: {r.reason}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}

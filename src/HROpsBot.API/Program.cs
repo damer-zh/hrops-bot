@@ -159,6 +159,10 @@ using (var scope = app.Services.CreateScope())
             "ALTER TABLE \"CertificateRequests\" ADD COLUMN IF NOT EXISTS \"RejectionReason\" character varying(500)");
         await db.Database.ExecuteSqlRawAsync(
             "ALTER TABLE \"EquipmentRequests\" ADD COLUMN IF NOT EXISTS \"RejectionReason\" character varying(500)");
+        await db.Database.ExecuteSqlRawAsync(
+            "ALTER TABLE \"VacationRequests\" ADD COLUMN IF NOT EXISTS \"CommentRu\" character varying(1000)");
+        await db.Database.ExecuteSqlRawAsync(
+            "ALTER TABLE \"ItRequests\" ADD COLUMN IF NOT EXISTS \"ResolutionNote\" character varying(1000)");
     }
     catch (Exception ex)
     {

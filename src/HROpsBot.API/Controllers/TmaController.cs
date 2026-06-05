@@ -2,6 +2,7 @@ using HROpsBot.Core.Interfaces;
 using HROpsBot.Domain.Entities;
 using HROpsBot.API.Hubs;
 using HROpsBot.Infrastructure.Persistence;
+using HROpsBot.Infrastructure.Telegram;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,8 @@ public class TmaController(
     IDocService docService,
     IItRequestService itRequestService,
     AppDbContext dbContext,
-    IHubContext<NotificationHub> hubContext) : ControllerBase
+    IHubContext<NotificationHub> hubContext,
+    TelegramBotAdapter botAdapter) : ControllerBase
 {
     // ==================== AUTH ====================
 
@@ -146,14 +148,16 @@ public class TmaController(
         {
             vacation = new { total, used, remaining },
             tasks = tasks.Select(t => new { t.Id, t.TitleRu, t.TitleKk, t.Status, t.Priority, t.IsOverdue }),
-            equipment = equipment.Select(e => new { e.Id, e.TicketNumber, e.Type, e.Status }),
+            equipment = equipment.Select(e => new { e.Id, e.TicketNumber, e.Type, e.Status, e.RejectionReason }),
             vacations = vacations.Take(5).Select(v => new
             {
-                v.Id, v.StartDate, v.EndDate, v.Status, v.DaysCount, v.CreatedAt
+                v.Id, v.StartDate, v.EndDate, v.Status, v.DaysCount, v.CreatedAt,
+                Reason = v.CommentRu
             }),
             itRequests = itRequests.Take(5).Select(r => new
             {
-                r.Id, r.Type, r.SystemName, r.Status, r.Priority, r.CreatedAt
+                r.Id, r.Type, r.SystemName, r.Status, r.Priority, r.CreatedAt,
+                Reason = r.ResolutionNote
             })
         });
     }
@@ -639,6 +643,7 @@ public class TmaController(
 
         if (employee == null) return;
 
+        // === SignalR — уведомление в Mini App ===
         await hubContext.Clients.Group($"emp_{employee.TelegramId}").SendAsync("ReceiveNotification", new
         {
             requestType,
@@ -648,6 +653,30 @@ public class TmaController(
             reason,
             changedAt = DateTime.UtcNow
         });
+
+        // === Telegram Bot — сообщение в чат сотруднику ===
+        var emoji = status switch
+        {
+            "Approved" or "Done"  => "✅",
+            "Rejected"            => "❌",
+            "InProgress"          => "⏳",
+            _                     => "🔔"
+        };
+
+        var botText = $"{emoji} *{message}*";
+        if (!string.IsNullOrWhiteSpace(reason))
+            botText += $"\n\n📋 *Причина:* {reason}";
+        botText += $"\n\n_HROps · {DateTime.UtcNow:dd.MM.yyyy HH:mm} UTC_";
+
+        try
+        {
+            await botAdapter.SendNotificationAsync(employee.TelegramId, botText);
+        }
+        catch (Exception ex)
+        {
+            // Не прерываем основной поток если бот недоступен
+            Console.Error.WriteLine($"[TmaController] Bot notify failed: {ex.Message}");
+        }
     }
 
     private Task NotifyHrAdminsAsync(

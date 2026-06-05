@@ -140,7 +140,6 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
             ? Math.round((vacation.used / vacation.total) * 100)
             : 0;
 
-    const activeTasksCount = tasks.length;
     const requestsCount = equipment.length + (itRequests?.length || 0);
 
     const sections: { key: Section; label: string; badge?: number; hide?: boolean }[] = [

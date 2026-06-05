@@ -107,7 +107,7 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
         );
     }
 
-    const { valid, employee, error, verifiedAt } = result!;
+    const { valid, employee, error } = result!;
 
     if (!valid) {
         return (

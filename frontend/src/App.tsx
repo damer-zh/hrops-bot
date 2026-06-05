@@ -6,6 +6,7 @@ import { useTelegramUser } from "./hooks/useTelegramUser";
 import { AdminDashboard } from "./components/AdminDashboard";
 import { EmployeeDashboard } from "./components/EmployeeDashboard";
 import { OnboardingForm } from "./components/forms/OnboardingForm";
+import { RoleSelect } from "./components/RoleSelect";
 import api from "./api";
 import * as signalR from "@microsoft/signalr";
 
@@ -25,7 +26,7 @@ export const App: React.FC = () => {
     const [employee, setEmployee] = useState<any>(null);
     const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
-    const [roleOverride, setRoleOverride] = useState<Role | null>(null);
+    const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const [showPass, setShowPass] = useState(false);
 
     useEffect(() => {
@@ -129,8 +130,19 @@ export const App: React.FC = () => {
         );
     }
 
+    // ---------- ROLE SELECTION SCREEN ----------
+    if (!selectedRole) {
+        return (
+            <RoleSelect
+                employeeName={employee.nameRu}
+                isHrAdmin={employee.isHrAdmin}
+                onSelect={(role) => setSelectedRole(role)}
+            />
+        );
+    }
+
     // ---------- RENDER ----------
-    const effectiveRole: Role = roleOverride ?? (employee.isHrAdmin ? "hr" : "employee");
+    const effectiveRole: Role = selectedRole;
     const isNewEmployee =
         Date.now() - new Date(employee.hiredAt).getTime() < 90 * 24 * 60 * 60 * 1000;
 
@@ -152,6 +164,27 @@ export const App: React.FC = () => {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <button
+                            id="btn-switch-role"
+                            onClick={() => setSelectedRole(null)}
+                            title="Сменить роль"
+                            style={{
+                                background: "rgba(255,255,255,0.18)",
+                                border: "1px solid rgba(255,255,255,0.35)",
+                                color: "#fff",
+                                borderRadius: 12,
+                                padding: "7px 14px",
+                                fontSize: "0.82rem",
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                            }}
+                        >
+                            ⇄ Роль
+                        </button>
+                        <button
+                            id="btn-show-pass"
                             onClick={() => setShowPass(true)}
                             style={{
                                 background: "rgba(255,255,255,0.18)",
@@ -170,29 +203,6 @@ export const App: React.FC = () => {
                             🪪 Пропуск
                         </button>
                         <div className="avatar">{employee.nameRu.charAt(0)}</div>
-                    </div>
-                </div>
-
-                {/* Role Switcher */}
-                <div style={{ marginTop: "16px", position: "relative", zIndex: 1 }}>
-                    <div style={{ fontSize: "0.68rem", opacity: 0.75, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                        🧪 Тест-режим: переключить вид
-                    </div>
-                    <div className="role-switcher" style={{ background: "rgba(255,255,255,0.15)" }}>
-                        <button
-                            className={`role-tab ${effectiveRole === "employee" ? "active" : ""}`}
-                            onClick={() => setRoleOverride("employee")}
-                            style={effectiveRole !== "employee" ? { color: "rgba(255,255,255,0.8)", background: "transparent" } : {}}
-                        >
-                            👤 Сотрудник
-                        </button>
-                        <button
-                            className={`role-tab ${effectiveRole === "hr" ? "active" : ""}`}
-                            onClick={() => setRoleOverride("hr")}
-                            style={effectiveRole !== "hr" ? { color: "rgba(255,255,255,0.8)", background: "transparent" } : {}}
-                        >
-                            🏢 HR
-                        </button>
                     </div>
                 </div>
             </div>

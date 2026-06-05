@@ -6,13 +6,12 @@ public class OnboardingProgress
     public int EmployeeId { get; set; }
 
     // Шаги онбординга
-    public bool DocsSubmitted      { get; set; } = false; // Документы сданы
-    public bool AccessGranted      { get; set; } = false; // Получил доступы к системам
-    public bool EquipmentReceived  { get; set; } = false; // Получил технику
-    public bool MaterialsRead      { get; set; } = false; // Прочитал вводные материалы
-    public bool FirstTasksDone     { get; set; } = false; // Выполнил первые задачи
-    public bool BuddyMet           { get; set; } = false; // Познакомился с бадди/ментором
-    public bool Hr1on1Done         { get; set; } = false; // Прошёл встречу 1-на-1 с HR
+    public bool FireSafetyDone          { get; set; } = false; // Пройти инструктаж по пожарной безопасности
+    public bool GeneralSafetyDone       { get; set; } = false; // Пройти инструктаж по общей безопасности
+    public bool CyberSafetyDone         { get; set; } = false; // Пройти инструктаж по кибербезопасности
+    public bool PassReceived            { get; set; } = false; // Получить пропуск
+    public bool FaceIdDone              { get; set; } = false; // Сделать FaceId для входа
+    public bool WorkplaceSetupRequested { get; set; } = false; // Запустить заявку на настройку рабочего места
 
     public DateTime StartedAt { get; set; } = DateTime.UtcNow;
 
@@ -24,7 +23,7 @@ public class OnboardingProgress
     {
         get
         {
-            var steps = new[] { DocsSubmitted, AccessGranted, EquipmentReceived, MaterialsRead, FirstTasksDone, BuddyMet, Hr1on1Done };
+            var steps = new[] { FireSafetyDone, GeneralSafetyDone, CyberSafetyDone, PassReceived, FaceIdDone, WorkplaceSetupRequested };
             return (int)Math.Round((double)steps.Count(s => s) / steps.Length * 100);
         }
     }

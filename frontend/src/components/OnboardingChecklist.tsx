@@ -7,66 +7,64 @@ interface OnboardingChecklistProps {
 }
 
 interface Progress {
-    docsSubmitted: boolean;
-    accessGranted: boolean;
-    equipmentReceived: boolean;
-    materialsRead: boolean;
-    firstTasksDone: boolean;
-    buddyMet: boolean;
-    hr1on1Done: boolean;
+    fireSafetyDone: boolean;
+    generalSafetyDone: boolean;
+    cyberSafetyDone: boolean;
+    passReceived: boolean;
+    faceIdDone: boolean;
+    workplaceSetupRequested: boolean;
     progressPercent: number;
     startedAt: string;
 }
 
 const STEPS = [
     {
-        key: "docs",
-        field: "docsSubmitted",
-        icon: "📄",
-        title: "Документы",
-        desc: "Подписать трудовой договор, НДА и прочие документы",
+        key: "fire_safety",
+        field: "fireSafetyDone",
+        icon: "🔥",
+        title: "Пожарная безопасность",
+        desc: "Пройти инструктаж по пожарной безопасности",
+        fullDesc: "Вам необходимо пройти обязательный инструктаж по пожарной безопасности. Ознакомьтесь с планами эвакуации, расположением огнетушителей и порядком действий при ЧС. Инструктаж проводится в кабинете 101 или онлайн на внутреннем портале."
     },
     {
-        key: "access",
-        field: "accessGranted",
-        icon: "🔑",
-        title: "Доступы к системам",
-        desc: "Получить доступ к Jira, Slack, корпоративной почте",
+        key: "general_safety",
+        field: "generalSafetyDone",
+        icon: "🦺",
+        title: "Общая безопасность",
+        desc: "Пройти инструктаж по общей безопасности",
+        fullDesc: "Ознакомьтесь с правилами охраны труда и техники безопасности на рабочем месте. Это включает в себя правила работы за компьютером, эргономику и общие правила поведения в офисе."
     },
     {
-        key: "equipment",
-        field: "equipmentReceived",
+        key: "cyber_safety",
+        field: "cyberSafetyDone",
         icon: "💻",
-        title: "Техника",
-        desc: "Получить ноутбук, монитор и рабочее оборудование",
+        title: "Кибербезопасность",
+        desc: "Пройти инструктаж по кибербезопасности",
+        fullDesc: "Изучите политику информационной безопасности компании. Узнайте, как защитить свои учетные записи, как распознавать фишинг и какие данные запрещено передавать третьим лицам. Пройдите тест на портале ИБ."
     },
     {
-        key: "materials",
-        field: "materialsRead",
-        icon: "📚",
-        title: "Вводные материалы",
-        desc: "Изучить регламенты, культуру компании и процессы",
+        key: "pass",
+        field: "passReceived",
+        icon: "🪪",
+        title: "Получить пропуск",
+        desc: "Оформить и получить физический пропуск",
+        fullDesc: "Подойдите на ресепшн или к сотрудникам службы безопасности (кабинет 102), чтобы сфотографироваться и получить физический пропуск для доступа в офис в нерабочее время (по необходимости)."
     },
     {
-        key: "buddy",
-        field: "buddyMet",
-        icon: "🤝",
-        title: "Знакомство с ментором",
-        desc: "Провести встречу с назначенным бадди/ментором",
+        key: "face_id",
+        field: "faceIdDone",
+        icon: "😎",
+        title: "Сделать FaceId",
+        desc: "Зарегистрировать лицо для входа",
+        fullDesc: "Служба безопасности должна отсканировать ваше лицо для добавления в систему биометрического контроля доступа на турникетах. Подойдите на пост охраны на первом этаже."
     },
     {
-        key: "tasks",
-        field: "firstTasksDone",
-        icon: "✅",
-        title: "Первые задачи",
-        desc: "Выполнить задачи первой недели от руководителя",
-    },
-    {
-        key: "hr1on1",
-        field: "hr1on1Done",
-        icon: "💬",
-        title: "Встреча 1-на-1 с HR",
-        desc: "Пройти первую встречу с HR для обратной связи",
+        key: "workplace",
+        field: "workplaceSetupRequested",
+        icon: "🖥️",
+        title: "Рабочее место",
+        desc: "Запустить заявку на настройку рабочего места",
+        fullDesc: "Оформите заявку в IT-отдел для подготовки вашего рабочего места: получение ноутбука, монитора, создание учетных записей (почта, мессенджеры, Jira, внутренние системы)."
     },
 ];
 
@@ -76,6 +74,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
 }) => {
     const [progress, setProgress] = useState<Progress | null>(null);
     const [updating, setUpdating] = useState<string | null>(null);
+    const [activeModal, setActiveModal] = useState<any>(null);
 
     useEffect(() => {
         api.get(`/tma/onboarding-progress/${employeeId}`)
@@ -108,6 +107,7 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
             console.error(e);
         } finally {
             setUpdating(null);
+            setActiveModal(null);
         }
     };
 
@@ -169,9 +169,10 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                             <div
                                 key={step.key}
                                 className="checklist-item"
-                                onClick={() => toggleStep(step.key, isDone)}
+                                onClick={() => setActiveModal({ step, isDone })}
                                 style={{
                                     opacity: updating === step.key ? 0.6 : 1,
+                                    cursor: "pointer",
                                 }}
                             >
                                 <div
@@ -200,6 +201,44 @@ export const OnboardingChecklist: React.FC<OnboardingChecklistProps> = ({
                             </div>
                         );
                     })}
+                </div>
+            )}
+
+            {/* Modal */}
+            {activeModal && (
+                <div style={{
+                    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                    background: "rgba(0,0,0,0.5)", zIndex: 100,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    padding: "20px"
+                }}>
+                    <div className="glass-card animate-fade-in" style={{ maxWidth: "400px", width: "100%", background: "#fff", color: "#111827" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                            <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                                {activeModal.step.icon} {activeModal.step.title}
+                            </div>
+                            <button onClick={() => setActiveModal(null)} style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer", color: "#9ca3af" }}>&times;</button>
+                        </div>
+                        <div style={{ fontSize: "0.95rem", lineHeight: 1.5, color: "#4b5563", marginBottom: "24px" }}>
+                            {activeModal.step.fullDesc}
+                        </div>
+                        <button
+                            onClick={() => toggleStep(activeModal.step.key, activeModal.isDone)}
+                            disabled={updating === activeModal.step.key}
+                            style={{
+                                width: "100%",
+                                padding: "12px",
+                                borderRadius: "8px",
+                                border: "none",
+                                background: activeModal.isDone ? "#ef4444" : "#2563eb",
+                                color: "#fff",
+                                fontWeight: 600,
+                                cursor: "pointer"
+                            }}
+                        >
+                            {updating === activeModal.step.key ? "Сохранение..." : activeModal.isDone ? "Снять отметку" : "Отметить как выполнено"}
+                        </button>
+                    </div>
                 </div>
             )}
         </div>

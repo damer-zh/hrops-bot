@@ -23,11 +23,12 @@ const COLORS = [
     "#3b82f6",
 ];
 
-type Section = "analytics" | "inbox" | "employees";
+type Section = "analytics" | "inbox" | "employees" | "onboarding";
 
 export const AdminDashboard: React.FC = () => {
     const [stats, setStats] = useState<any>(null);
     const [employees, setEmployees] = useState<any[]>([]);
+    const [onboardingList, setOnboardingList] = useState<any[]>([]);
     const [section, setSection] = useState<Section>("analytics");
     const [pendingCount, setPendingCount] = useState(0);
     const [empSearch, setEmpSearch] = useState("");
@@ -39,12 +40,16 @@ export const AdminDashboard: React.FC = () => {
         api.get("/tma/admin/employees")
             .then((res) => setEmployees(res.data))
             .catch(console.error);
+        api.get("/tma/admin/onboarding")
+            .then((res) => setOnboardingList(res.data))
+            .catch(console.error);
     }, []);
 
     const sections: { key: Section; label: string; badge?: number }[] = [
         { key: "analytics", label: "📊 Аналитика" },
         { key: "inbox", label: "📥 Заявки", badge: pendingCount },
         { key: "employees", label: "👥 Сотрудники" },
+        { key: "onboarding", label: "🚀 Онбординг" },
     ];
 
     const filteredEmp = employees.filter(
@@ -467,6 +472,55 @@ export const AdminDashboard: React.FC = () => {
                                     >
                                         {emp.vacationDaysRemaining} дн.
                                     </span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {/* ===== ONBOARDING ===== */}
+            {section === "onboarding" && (
+                <div className="glass-card no-hover">
+                    <div className="section-header">
+                        <div className="section-title">🚀 Прогресс онбординга</div>
+                        <span className="badge info">{onboardingList.length}</span>
+                    </div>
+                    {onboardingList.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="empty-state-icon">✅</div>
+                            <div className="empty-state-text">Нет активных онбордингов</div>
+                        </div>
+                    ) : (
+                        onboardingList.map((ob) => (
+                            <div key={ob.id} className="list-item" style={{ flexDirection: "column", alignItems: "stretch", gap: "10px" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <div style={{ fontWeight: 600 }}>{ob.employeeName}</div>
+                                    <span className={`badge ${ob.progressPercent === 100 ? "success" : ob.progressPercent > 50 ? "info" : "warning"}`}>
+                                        {ob.progressPercent}%
+                                    </span>
+                                </div>
+                                <div style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>
+                                    {ob.employeeDepartment || "Отдел не указан"}
+                                </div>
+                                <div className="progress-bar-bg" style={{ height: "6px", margin: "4px 0" }}>
+                                    <div
+                                        className="progress-bar-fill"
+                                        style={{ width: `${ob.progressPercent}%`, height: "100%" }}
+                                    />
+                                </div>
+                                <div style={{ fontSize: "0.75rem", display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "4px" }}>
+                                    {[{ key: "fireSafetyDone", icon: "🔥", label: "Пож. безоп." },
+                                      { key: "generalSafetyDone", icon: "🦺", label: "Общ. безоп." },
+                                      { key: "cyberSafetyDone", icon: "💻", label: "Кибер" },
+                                      { key: "passReceived", icon: "🪪", label: "Пропуск" },
+                                      { key: "faceIdDone", icon: "😎", label: "FaceId" },
+                                      { key: "workplaceSetupRequested", icon: "🖥️", label: "РМ" }
+                                    ].map(step => (
+                                        <span key={step.key} style={{ color: ob[step.key] ? "var(--green-600)" : "var(--text-muted)", textDecoration: ob[step.key] ? "none" : "line-through" }}>
+                                            {step.icon} {step.label}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         ))

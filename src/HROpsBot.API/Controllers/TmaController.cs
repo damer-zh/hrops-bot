@@ -93,13 +93,12 @@ public class TmaController(
         {
             progress.Id,
             progress.EmployeeId,
-            progress.DocsSubmitted,
-            progress.AccessGranted,
-            progress.EquipmentReceived,
-            progress.MaterialsRead,
-            progress.FirstTasksDone,
-            progress.BuddyMet,
-            progress.Hr1on1Done,
+            progress.FireSafetyDone,
+            progress.GeneralSafetyDone,
+            progress.CyberSafetyDone,
+            progress.PassReceived,
+            progress.FaceIdDone,
+            progress.WorkplaceSetupRequested,
             progress.ProgressPercent,
             progress.StartedAt
         });
@@ -121,6 +120,29 @@ public class TmaController(
     {
         var progress = await hrService.UpdateOnboardingStepAsync(employeeId, req.Step, req.Value);
         return Ok(new { progress.ProgressPercent });
+    }
+
+    /// <summary>[ADMIN] Список онбордингов</summary>
+    [HttpGet("admin/onboarding")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAdminOnboardingProgress()
+    {
+        var progresses = await hrService.GetAllOnboardingProgressesAsync();
+        return Ok(progresses.Select(p => new
+        {
+            p.Id,
+            p.EmployeeId,
+            EmployeeName = p.Employee.NameRu,
+            EmployeeDepartment = p.Employee.Department,
+            p.FireSafetyDone,
+            p.GeneralSafetyDone,
+            p.CyberSafetyDone,
+            p.PassReceived,
+            p.FaceIdDone,
+            p.WorkplaceSetupRequested,
+            p.ProgressPercent,
+            p.StartedAt
+        }));
     }
 
     // ==================== EMPLOYEE DASHBOARD ====================

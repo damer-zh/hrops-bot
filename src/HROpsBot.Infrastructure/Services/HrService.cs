@@ -229,17 +229,24 @@ public class HrService(AppDbContext dbContext) : IHrService
 
         switch (step.ToLower())
         {
-            case "docs":       progress.DocsSubmitted     = value; break;
-            case "access":     progress.AccessGranted     = value; break;
-            case "equipment":  progress.EquipmentReceived = value; break;
-            case "materials":  progress.MaterialsRead     = value; break;
-            case "tasks":      progress.FirstTasksDone    = value; break;
-            case "buddy":      progress.BuddyMet          = value; break;
-            case "hr1on1":     progress.Hr1on1Done        = value; break;
+            case "fire_safety":    progress.FireSafetyDone          = value; break;
+            case "general_safety": progress.GeneralSafetyDone       = value; break;
+            case "cyber_safety":   progress.CyberSafetyDone         = value; break;
+            case "pass":           progress.PassReceived            = value; break;
+            case "face_id":        progress.FaceIdDone              = value; break;
+            case "workplace":      progress.WorkplaceSetupRequested = value; break;
         }
 
         await dbContext.SaveChangesAsync();
         return progress;
+    }
+
+    public async Task<List<OnboardingProgress>> GetAllOnboardingProgressesAsync()
+    {
+        return await dbContext.OnboardingProgresses
+            .Include(o => o.Employee)
+            .OrderByDescending(o => o.StartedAt)
+            .ToListAsync();
     }
 
     // ==================== АНАЛИТИКА ====================

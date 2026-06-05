@@ -124,6 +124,12 @@ using (var scope = app.Services.CreateScope())
     // Поэтому принудительно прогоняем скрипт создания таблиц с IF NOT EXISTS.
     try
     {
+        try {
+            await db.Database.ExecuteSqlRawAsync("SELECT \"FireSafetyDone\" FROM \"OnboardingProgresses\" LIMIT 1");
+        } catch {
+            await db.Database.ExecuteSqlRawAsync("DROP TABLE IF EXISTS \"OnboardingProgresses\" CASCADE;");
+        }
+
         var script = db.Database.GenerateCreateScript();
         var statements = script.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
         foreach (var statement in statements)

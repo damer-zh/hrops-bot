@@ -33,6 +33,7 @@ public interface IHrService
     // --- Онбординг ---
     Task<OnboardingProgress> GetOrCreateOnboardingAsync(int employeeId);
     Task<OnboardingProgress> UpdateOnboardingStepAsync(int employeeId, string step, bool value);
+    Task<List<OnboardingProgress>> GetAllOnboardingProgressesAsync();
 
     // --- Аналитика ---
     Task<HrAnalyticsDto> GetAnalyticsAsync();

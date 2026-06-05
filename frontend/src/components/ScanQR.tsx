@@ -189,7 +189,6 @@ export const ScanQR: React.FC<ScanQRProps> = ({ onTokenFound, onClose }) => {
                             border: "2px solid rgba(59,130,246,0.8)",
                             borderRadius: 12,
                             pointerEvents: "none",
-                            className: "scanning-border",
                         }} />
                         <div style={{
                             position: "absolute",

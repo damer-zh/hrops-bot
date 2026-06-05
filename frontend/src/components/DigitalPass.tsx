@@ -25,8 +25,6 @@ export const DigitalPass: React.FC<DigitalPassProps> = ({ employeeId, employee, 
     const [secondsLeft, setSecondsLeft] = useState(300);
     const [qrError, setQrError] = useState(false);
 
-    const apiBase = (import.meta.env.VITE_API_URL as string) || "";
-
     const loadPass = useCallback(async () => {
         setLoading(true);
         setQrError(false);

@@ -169,9 +169,6 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token }) => {
     const emp = employee!;
     const initials = emp.nameRu.split(" ").slice(0, 2).map(s => s[0]).join("");
     const hiredDate = new Date(emp.hiredAt).toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
-    const verifiedAtFmt = verifiedAt
-        ? new Date(verifiedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-        : new Date().toLocaleTimeString("ru-RU");
 
     return (
         <div style={{

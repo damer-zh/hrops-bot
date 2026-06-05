@@ -564,6 +564,13 @@ select.input-field option {
     font-weight: 700;
     color: #fff;
     flex-shrink: 0;
+    overflow: hidden;
+}
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .avatar-button {
@@ -624,6 +631,46 @@ select.input-field option {
     font-size: 2.2rem;
     font-weight: 800;
     box-shadow: var(--shadow-green);
+    border: none;
+    overflow: hidden;
+}
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.profile-avatar-action {
+    cursor: pointer;
+    padding: 0;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.profile-avatar-action:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 26px rgba(22, 163, 74, 0.36);
+}
+.profile-avatar-action:active {
+    transform: scale(0.97);
+}
+.profile-file-input {
+    display: none;
+}
+.profile-avatar-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+}
+.profile-avatar-controls .btn {
+    padding-inline: 8px;
+    min-width: 0;
+}
+.profile-avatar-controls .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
 }
 .profile-name {
     font-family: "Outfit", sans-serif;
@@ -668,6 +715,35 @@ select.input-field option {
     font-size: 0.83rem;
     text-align: right;
     overflow-wrap: anywhere;
+}
+
+.avatar-preview-modal {
+    width: min(88vw, 360px);
+    aspect-ratio: 1;
+    position: relative;
+}
+.avatar-preview-modal img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 28px;
+    display: block;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+}
+.avatar-preview-close {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background: #fff;
+    color: var(--text-primary);
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    z-index: 1;
 }
 
 /* ==========================================

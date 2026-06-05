@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { VerifyPage } from "./components/VerifyPage";
 import { ScanQR } from "./components/ScanQR";
 import { DigitalPass } from "./components/DigitalPass";
@@ -42,12 +42,50 @@ const formatDateRu = (value?: string | null) => {
     });
 };
 
+const getAvatarStorageKey = (employeeId: number) => `hrops-avatar-${employeeId}`;
+
+const resizeAvatarFile = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Не удалось прочитать файл"));
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error("Не удалось загрузить изображение"));
+            img.onload = () => {
+                const size = 360;
+                const canvas = document.createElement("canvas");
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext("2d");
+
+                if (!ctx) {
+                    reject(new Error("Canvas недоступен"));
+                    return;
+                }
+
+                const side = Math.min(img.width, img.height);
+                const sx = (img.width - side) / 2;
+                const sy = (img.height - side) / 2;
+
+                ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+                resolve(canvas.toDataURL("image/jpeg", 0.86));
+            };
+            img.src = String(reader.result);
+        };
+        reader.readAsDataURL(file);
+    });
+
 const EmployeeProfilePage: React.FC<{
     employee: EmployeeProfile;
+    avatarUrl: string | null;
     onBack: () => void;
     onShowPass: () => void;
-}> = ({ employee, onBack, onShowPass }) => {
+    onAvatarChange: (file: File) => void;
+    onRemoveAvatar: () => void;
+    onViewAvatar: () => void;
+}> = ({ employee, avatarUrl, onBack, onShowPass, onAvatarChange, onRemoveAvatar, onViewAvatar }) => {
     const initial = employee.nameRu?.trim().charAt(0).toUpperCase() || "?";
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className="profile-page animate-fade-in delay-100">
@@ -56,13 +94,62 @@ const EmployeeProfilePage: React.FC<{
             </button>
 
             <div className="profile-card glass-card no-hover">
-                <div className="profile-avatar">{initial}</div>
+                <button
+                    type="button"
+                    className="profile-avatar profile-avatar-action"
+                    onClick={() => {
+                        if (avatarUrl) onViewAvatar();
+                        else fileInputRef.current?.click();
+                    }}
+                    title={avatarUrl ? "Посмотреть аватарку" : "Поставить аватарку"}
+                    aria-label={avatarUrl ? "Посмотреть аватарку" : "Поставить аватарку"}
+                >
+                    {avatarUrl ? <img src={avatarUrl} alt="" /> : initial}
+                </button>
                 <div className="profile-name">{employee.nameRu}</div>
                 <div className="profile-role">
                     {employee.position || "Должность не указана"}
                 </div>
                 <div className="profile-department">
                     {employee.department || "Отдел не указан"}
+                </div>
+
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="profile-file-input"
+                    onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        if (file) onAvatarChange(file);
+                        event.currentTarget.value = "";
+                    }}
+                />
+
+                <div className="profile-avatar-controls">
+                    <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        Поставить
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={onViewAvatar}
+                        disabled={!avatarUrl}
+                    >
+                        Посмотреть
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={onRemoveAvatar}
+                        disabled={!avatarUrl}
+                    >
+                        Убрать
+                    </button>
                 </div>
 
                 <div className="profile-details">
@@ -96,6 +183,8 @@ export const App: React.FC = () => {
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const [showPass, setShowPass] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [showAvatarPreview, setShowAvatarPreview] = useState(false);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -106,6 +195,14 @@ export const App: React.FC = () => {
                 setErrorMsg(err.message + " | URL: " + err.config?.url);
             });
     }, [user]);
+
+    useEffect(() => {
+        if (!employee?.id) {
+            setAvatarUrl(null);
+            return;
+        }
+        setAvatarUrl(localStorage.getItem(getAvatarStorageKey(employee.id)));
+    }, [employee?.id]);
 
     useEffect(() => {
         if (!user?.id || !employee) return;
@@ -223,13 +320,35 @@ export const App: React.FC = () => {
     const effectiveRole: Role = selectedRole;
     const isNewEmployee =
         Date.now() - new Date(employee.hiredAt).getTime() < 90 * 24 * 60 * 60 * 1000;
+    const openProfile = () => setShowProfile(true);
+    const initial = employee.nameRu?.trim().charAt(0).toUpperCase() || "?";
+
+    const handleAvatarChange = (file: File) => {
+        if (!file.type.startsWith("image/")) return;
+
+        resizeAvatarFile(file)
+            .then((dataUrl) => {
+                localStorage.setItem(getAvatarStorageKey(employee.id), dataUrl);
+                setAvatarUrl(dataUrl);
+            })
+            .catch((err) => {
+                console.error(err);
+                window.Telegram?.WebApp?.showAlert?.("Не удалось поставить аватарку");
+            });
+    };
+
+    const removeAvatar = () => {
+        localStorage.removeItem(getAvatarStorageKey(employee.id));
+        setAvatarUrl(null);
+        setShowAvatarPreview(false);
+    };
 
     return (
         <div style={{ paddingBottom: "24px" }}>
             {/* HEADER */}
             <div className="app-header animate-fade-in" style={{ marginBottom: "16px" }}>
                 <div className="flex-between" style={{ position: "relative", zIndex: 1 }}>
-                    <div>
+                    <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: "0.75rem", opacity: 0.8, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                             {effectiveRole === "hr" ? "🏢 HR-Панель" : "👤 Сотрудник"}
                         </div>
@@ -240,7 +359,7 @@ export const App: React.FC = () => {
                             {employee.position} · {employee.department}
                         </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative", zIndex: 2 }}>
                         <button
                             id="btn-switch-role"
                             onClick={() => {
@@ -283,19 +402,17 @@ export const App: React.FC = () => {
                         >
                             🪪 Пропуск
                         </button>
-                        {effectiveRole === "employee" ? (
-                            <button
-                                id="btn-open-profile"
-                                className="avatar avatar-button"
-                                onClick={() => setShowProfile(true)}
-                                title="Открыть профиль"
-                                aria-label="Открыть профиль"
-                            >
-                                {employee.nameRu.charAt(0)}
-                            </button>
-                        ) : (
-                            <div className="avatar">{employee.nameRu.charAt(0)}</div>
-                        )}
+                        <button
+                            id="btn-open-profile"
+                            type="button"
+                            className="avatar avatar-button"
+                            onClick={openProfile}
+                            onPointerUp={openProfile}
+                            title="Открыть профиль"
+                            aria-label="Открыть профиль"
+                        >
+                            {avatarUrl ? <img src={avatarUrl} alt="" /> : initial}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -322,11 +439,17 @@ export const App: React.FC = () => {
             )}
 
             {/* DASHBOARD */}
-            {showProfile && effectiveRole === "employee" ? (
+            {showProfile ? (
                 <EmployeeProfilePage
                     employee={employee}
+                    avatarUrl={avatarUrl}
                     onBack={() => setShowProfile(false)}
                     onShowPass={() => setShowPass(true)}
+                    onAvatarChange={handleAvatarChange}
+                    onRemoveAvatar={removeAvatar}
+                    onViewAvatar={() => {
+                        if (avatarUrl) setShowAvatarPreview(true);
+                    }}
                 />
             ) : effectiveRole === "hr" ? (
                 <AdminDashboard />
@@ -351,6 +474,22 @@ export const App: React.FC = () => {
                     }}
                     onClose={() => setShowPass(false)}
                 />
+            )}
+
+            {showAvatarPreview && avatarUrl && (
+                <div className="modal-overlay" onClick={() => setShowAvatarPreview(false)}>
+                    <div className="avatar-preview-modal" onClick={(event) => event.stopPropagation()}>
+                        <button
+                            type="button"
+                            className="avatar-preview-close"
+                            onClick={() => setShowAvatarPreview(false)}
+                            aria-label="Закрыть просмотр аватарки"
+                        >
+                            ✕
+                        </button>
+                        <img src={avatarUrl} alt="Аватарка сотрудника" />
+                    </div>
+                </div>
             )}
         </div>
     );

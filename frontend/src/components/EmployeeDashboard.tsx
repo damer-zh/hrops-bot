@@ -30,6 +30,8 @@ const VAC_STATUS_BADGE: Record<number, { cls: string; label: string }> = {
     3: { cls: "neutral", label: "Отменено" },
 };
 
+type Section = "main" | "tasks" | "requests" | "onboarding";
+
 export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
     employeeId,
     employeeName,
@@ -38,6 +40,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [section, setSection] = useState<Section>(isNewEmployee ? "onboarding" : "main");
 
     const loadData = useCallback(() => {
         setLoading(true);
@@ -137,21 +140,60 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
             ? Math.round((vacation.used / vacation.total) * 100)
             : 0;
 
+    const activeTasksCount = tasks.length;
+    const requestsCount = equipment.length + (itRequests?.length || 0);
+
+    const sections: { key: Section; label: string; badge?: number; hide?: boolean }[] = [
+        { key: "onboarding", label: "🚀 Онбординг", hide: !isNewEmployee },
+        { key: "main", label: "🏠 Главная" },
+        { key: "tasks", label: "✅ Задачи", badge: overdueTasks > 0 ? overdueTasks : undefined },
+        { key: "requests", label: "📥 Мои заявки", badge: requestsCount > 0 ? requestsCount : undefined },
+    ];
+
     return (
         <div
             className="animate-fade-in delay-100"
             style={{ display: "flex", flexDirection: "column", gap: "16px" }}
         >
-            {/* ===== ONBOARDING CHECKLIST (only new employees <90 days) ===== */}
-            {isNewEmployee && (
+            <div className="tab-bar">
+                {sections.filter(s => !s.hide).map((s) => (
+                    <button
+                        key={s.key}
+                        className={`tab-btn ${section === s.key ? "active" : ""}`}
+                        onClick={() => setSection(s.key)}
+                    >
+                        {s.label}
+                        {(s.badge ?? 0) > 0 && (
+                            <span
+                                style={{
+                                    marginLeft: "6px",
+                                    background: "#ef4444",
+                                    color: "#fff",
+                                    borderRadius: "999px",
+                                    padding: "1px 7px",
+                                    fontSize: "0.7rem",
+                                    fontWeight: 700,
+                                }}
+                            >
+                                {s.badge}
+                            </span>
+                        )}
+                    </button>
+                ))}
+            </div>
+
+            {/* ===== ONBOARDING CHECKLIST ===== */}
+            {section === "onboarding" && isNewEmployee && (
                 <OnboardingChecklist
                     employeeId={employeeId}
                     employeeName={employeeName}
                 />
             )}
 
-            {/* ===== VACATION CARD ===== */}
-            <div className="glass-card">
+            {/* ===== MAIN (Отпуск + Service Actions) ===== */}
+            {section === "main" && (
+                <>
+                    <div className="glass-card">
                 <div className="section-header">
                     <div className="section-title">🌴 Отпуск</div>
                     <span
@@ -257,7 +299,16 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                 )}
             </div>
 
-            {/* ===== TASKS CARD ===== */}
+            <ServiceActions
+                employeeId={employeeId}
+                vacationBalance={vacation}
+                onRequestCreated={loadData}
+            />
+        </>
+    )}
+
+    {/* ===== TASKS CARD ===== */}
+    {section === "tasks" && (
             <div className="glass-card">
                 <div className="section-header">
                     <div className="section-title">✅ Задачи</div>
@@ -315,7 +366,11 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                     ))
                 )}
             </div>
+    )}
 
+    {/* ===== REQUESTS ===== */}
+    {section === "requests" && (
+        <>
             {/* ===== EQUIPMENT CARD ===== */}
             {equipment.length > 0 && (
                 <div className="glass-card">
@@ -414,13 +469,17 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                     })}
                 </div>
             )}
-
-            {/* ===== SERVICE ACTIONS ===== */}
-            <ServiceActions
-                employeeId={employeeId}
-                vacationBalance={vacation}
-                onRequestCreated={loadData}
-            />
+            
+            {equipment.length === 0 && (!itRequests || itRequests.length === 0) && (
+                <div className="empty-state">
+                    <div className="empty-state-icon">📥</div>
+                    <div className="empty-state-text">
+                        У вас нет активных заявок
+                    </div>
+                </div>
+            )}
+        </>
+    )}
         </div>
     );
 };

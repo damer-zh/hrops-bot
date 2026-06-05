@@ -3,6 +3,7 @@ using System.Text;
 using HROpsBot.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace HROpsBot.API.Controllers;
 
@@ -12,7 +13,7 @@ namespace HROpsBot.API.Controllers;
 [ApiController]
 [Route("api/pass")]
 [Produces("application/json")]
-public class PassController(AppDbContext dbContext, IConfiguration configuration) : ControllerBase
+public class PassController(AppDbContext dbContext, IConfiguration configuration, ILogger<PassController> logger) : ControllerBase
 {
     // Секрет для подписи токена (настраивается в appsettings)
     private string Secret => configuration["Pass:Secret"] ?? "hropsbot-pass-secret-default-key";
@@ -83,17 +84,29 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
             var parts = raw.Split('~');
 
             if (parts.Length != 3)
+            {
+                logger.LogWarning("VerifyPass failed: Invalid format (parts.Length != 3)");
                 return Ok(new { valid = false, error = "Недействительный пропуск" });
+            }
 
             if (!int.TryParse(parts[0], out var employeeId))
+            {
+                logger.LogWarning("VerifyPass failed: Invalid employeeId format");
                 return Ok(new { valid = false, error = "Недействительный пропуск" });
+            }
 
             if (!long.TryParse(parts[1], out var expiry))
+            {
+                logger.LogWarning("VerifyPass failed: Invalid expiry format");
                 return Ok(new { valid = false, error = "Недействительный пропуск" });
+            }
 
             // Проверка срока действия
             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiry)
+            {
+                logger.LogWarning("VerifyPass failed: Pass expired (employeeId={EmployeeId})", employeeId);
                 return Ok(new { valid = false, error = "Пропуск истёк. Попросите сотрудника обновить QR." });
+            }
 
             // Проверка HMAC (защита от подделки)
             var expectedHmac = ComputeHmac($"{parts[0]}~{parts[1]}");
@@ -103,6 +116,7 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
             if (actualBytes.Length != expectedBytes.Length ||
                 !CryptographicOperations.FixedTimeEquals(actualBytes, expectedBytes))
             {
+                logger.LogWarning("VerifyPass failed: HMAC mismatch (employeeId={EmployeeId})", employeeId);
                 return Ok(new { valid = false, error = "Подпись не совпадает. Пропуск недействителен." });
             }
 
@@ -112,10 +126,15 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
                 .FirstOrDefaultAsync(e => e.Id == employeeId);
 
             if (employee == null)
+            {
+                logger.LogWarning("VerifyPass failed: Employee not found in DB (employeeId={EmployeeId})", employeeId);
                 return Ok(new { valid = false, error = "Сотрудник не найден в системе" });
+            }
 
             var dept = string.IsNullOrEmpty(employee.Department) ? "Новый сотрудник" : employee.Department;
             var pos = string.IsNullOrEmpty(employee.Position) ? "Стажёр" : employee.Position;
+
+            logger.LogInformation("VerifyPass success: Employee validated (employeeId={EmployeeId})", employeeId);
 
             return Ok(new
             {
@@ -133,9 +152,10 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
                 }
             });
         }
-        catch
+        catch (Exception ex)
         {
-            return Ok(new { valid = false, error = "Ошибка разбора токена" });
+            logger.LogError(ex, "VerifyPass threw an exception");
+            return Ok(new { valid = false, error = "Ошибка сервера при проверке пропуска" });
         }
     }
 

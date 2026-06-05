@@ -5,12 +5,13 @@ import { DigitalPass } from "./components/DigitalPass";
 import { useTelegramUser } from "./hooks/useTelegramUser";
 import { AdminDashboard } from "./components/AdminDashboard";
 import { EmployeeDashboard } from "./components/EmployeeDashboard";
+import { GuardDashboard } from "./components/GuardDashboard";
 import { OnboardingForm } from "./components/forms/OnboardingForm";
 import { RoleSelect } from "./components/RoleSelect";
 import api from "./api";
 import * as signalR from "@microsoft/signalr";
 
-type Role = "employee" | "hr";
+type Role = "employee" | "hr" | "guard";
 
 type RealtimeNotification = {
     requestType?: string;
@@ -137,6 +138,16 @@ export const App: React.FC = () => {
                 employeeName={employee.nameRu}
                 isHrAdmin={employee.isHrAdmin}
                 onSelect={(role) => setSelectedRole(role)}
+            />
+        );
+    }
+
+    // ---------- GUARD DASHBOARD ----------
+    if (selectedRole === "guard") {
+        return (
+            <GuardDashboard
+                guardName={employee.nameRu}
+                onSwitchRole={() => setSelectedRole(null)}
             />
         );
     }

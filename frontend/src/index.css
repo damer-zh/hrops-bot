@@ -995,6 +995,10 @@ select.input-field option {
     background: linear-gradient(135deg, rgba(147, 197, 253, 0.35), rgba(99, 163, 253, 0.2));
     border: 1px solid rgba(147, 197, 253, 0.4);
 }
+.guard-icon-wrap {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.35), rgba(245, 158, 11, 0.2));
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
 .role-card-icon {
     font-size: 1.8rem;
 }

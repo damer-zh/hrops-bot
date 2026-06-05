@@ -1,6 +1,6 @@
 import React from "react";
 
-type Role = "employee" | "hr";
+type Role = "employee" | "hr" | "guard";
 
 interface RoleSelectProps {
     employeeName: string;
@@ -43,6 +43,24 @@ export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin,
                             <div className="role-card-title">Сотрудник</div>
                             <div className="role-card-desc">
                                 Мои заявки, отпуска, документы и онбординг
+                            </div>
+                        </div>
+                        <div className="role-card-arrow">→</div>
+                    </button>
+
+                    {/* Guard Card */}
+                    <button
+                        id="role-select-guard"
+                        className="role-card guard-card"
+                        onClick={() => onSelect("guard")}
+                    >
+                        <div className="role-card-icon-wrap guard-icon-wrap">
+                            <span className="role-card-icon">🛡️</span>
+                        </div>
+                        <div className="role-card-body">
+                            <div className="role-card-title">Охранник</div>
+                            <div className="role-card-desc">
+                                Сканирование QR-пропусков сотрудников
                             </div>
                         </div>
                         <div className="role-card-arrow">→</div>

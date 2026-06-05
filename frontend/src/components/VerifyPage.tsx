@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import api from "../api";
 
 const Confetti: React.FC<{ count?: number }> = ({ count = 50 }) => {
     const pieces = Array.from({ length: count }).map((_, i) => ({
@@ -65,25 +66,21 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ token, onClose }) => {
     const [result, setResult] = useState<VerifyResult | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const apiBase = (import.meta.env.VITE_API_URL as string) || "";
-
     useEffect(() => {
         const verify = async () => {
             try {
-                const res = await fetch(
-                    `${apiBase}/api/pass/verify?t=${encodeURIComponent(token)}`,
-                    { headers: { Accept: "application/json" } }
-                );
-                const data: VerifyResult = await res.json();
-                setResult(data);
-            } catch {
-                setResult({ valid: false, error: "Нет связи с сервером" });
+                const res = await api.get(`/pass/verify?t=${encodeURIComponent(token)}`);
+                setResult(res.data);
+            } catch (err: any) {
+                console.error("Verify API Error:", err);
+                const msg = err.response?.data?.error || err.message || "Нет связи с сервером";
+                setResult({ valid: false, error: msg });
             } finally {
                 setLoading(false);
             }
         };
         verify();
-    }, [token, apiBase]);
+    }, [token]);
 
     if (loading) {
         return (

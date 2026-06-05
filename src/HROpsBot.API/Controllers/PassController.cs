@@ -114,11 +114,8 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
             if (employee == null)
                 return Ok(new { valid = false, error = "Сотрудник не найден в системе" });
 
-            // Простая проверка: сотрудник активен (не уволен)
-            var isActive = !string.IsNullOrEmpty(employee.Department);
-
-            if (!isActive)
-                return Ok(new { valid = false, error = "Сотрудник больше не работает в компании" });
+            var dept = string.IsNullOrEmpty(employee.Department) ? "Новый сотрудник" : employee.Department;
+            var pos = string.IsNullOrEmpty(employee.Position) ? "Стажёр" : employee.Position;
 
             return Ok(new
             {
@@ -129,8 +126,8 @@ public class PassController(AppDbContext dbContext, IConfiguration configuration
                     employee.Id,
                     employee.NameRu,
                     employee.NameKk,
-                    employee.Department,
-                    employee.Position,
+                    Department = dept,
+                    Position = pos,
                     employee.HiredAt,
                     employee.IsHrAdmin,
                 }

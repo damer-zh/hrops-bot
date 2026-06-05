@@ -23,11 +23,11 @@ const IT_STATUS_BADGE: Record<number, { cls: string; label: string }> = {
     3: { cls: "success", label: "Готово" },
     4: { cls: "danger", label: "Отклонено" },
 };
-const VAC_STATUS_BADGE: Record<string, { cls: string; label: string }> = {
-    Pending: { cls: "warning", label: "Ожидает" },
-    Approved: { cls: "success", label: "Одобрено" },
-    Rejected: { cls: "danger", label: "Отклонено" },
-    Cancelled: { cls: "neutral", label: "Отменено" },
+const VAC_STATUS_BADGE: Record<number, { cls: string; label: string }> = {
+    0: { cls: "warning", label: "Ожидает" },
+    1: { cls: "success", label: "Одобрено" },
+    2: { cls: "danger", label: "Отклонено" },
+    3: { cls: "neutral", label: "Отменено" },
 };
 
 export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
@@ -236,7 +236,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                                             {st.label}
                                         </span>
                                     </div>
-                                    {v.status === "Rejected" && v.reason && (
+                                    {v.status === 2 && v.reason && (
                                         <div style={{
                                             fontSize: "0.75rem",
                                             color: "#dc2626",

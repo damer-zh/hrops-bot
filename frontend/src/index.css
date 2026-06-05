@@ -566,6 +566,110 @@ select.input-field option {
     flex-shrink: 0;
 }
 
+.avatar-button {
+    cursor: pointer;
+    padding: 0;
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.avatar-button:hover {
+    background: rgba(255, 255, 255, 0.34);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    transform: translateY(-1px);
+}
+.avatar-button:active {
+    transform: scale(0.96);
+}
+.avatar-button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   PROFILE
+   ========================================== */
+.profile-page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.profile-back-btn {
+    align-self: flex-start;
+    border: 1px solid var(--green-200);
+    background: var(--green-100);
+    color: var(--green-700);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-family: "Inter", sans-serif;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.profile-card {
+    text-align: center;
+}
+.profile-avatar {
+    width: 86px;
+    height: 86px;
+    border-radius: 50%;
+    margin: 2px auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    color: #fff;
+    font-family: "Outfit", sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    box-shadow: var(--shadow-green);
+}
+.profile-name {
+    font-family: "Outfit", sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+.profile-role {
+    margin-top: 5px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--green-700);
+}
+.profile-department {
+    margin-top: 3px;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+}
+.profile-details {
+    margin: 18px 0;
+    border-top: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-light);
+}
+.profile-detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+    text-align: left;
+}
+.profile-detail-row:last-child {
+    border-bottom: none;
+}
+.profile-detail-row span {
+    color: var(--text-secondary);
+    font-size: 0.83rem;
+}
+.profile-detail-row strong {
+    color: var(--text-primary);
+    font-size: 0.83rem;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
 /* ==========================================
    MODAL
    ========================================== */

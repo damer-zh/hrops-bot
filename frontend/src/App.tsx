@@ -22,6 +22,72 @@ type RealtimeNotification = {
     changedAt?: string;
 };
 
+type EmployeeProfile = {
+    id: number;
+    nameRu: string;
+    department?: string | null;
+    position?: string | null;
+    hiredAt?: string | null;
+    isHrAdmin?: boolean;
+};
+
+const formatDateRu = (value?: string | null) => {
+    if (!value) return "Не указано";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Не указано";
+    return date.toLocaleDateString("ru-RU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+    });
+};
+
+const EmployeeProfilePage: React.FC<{
+    employee: EmployeeProfile;
+    onBack: () => void;
+    onShowPass: () => void;
+}> = ({ employee, onBack, onShowPass }) => {
+    const initial = employee.nameRu?.trim().charAt(0).toUpperCase() || "?";
+
+    return (
+        <div className="profile-page animate-fade-in delay-100">
+            <button className="profile-back-btn" onClick={onBack}>
+                ← Назад
+            </button>
+
+            <div className="profile-card glass-card no-hover">
+                <div className="profile-avatar">{initial}</div>
+                <div className="profile-name">{employee.nameRu}</div>
+                <div className="profile-role">
+                    {employee.position || "Должность не указана"}
+                </div>
+                <div className="profile-department">
+                    {employee.department || "Отдел не указан"}
+                </div>
+
+                <div className="profile-details">
+                    <div className="profile-detail-row">
+                        <span>ID сотрудника</span>
+                        <strong>{employee.id}</strong>
+                    </div>
+                    <div className="profile-detail-row">
+                        <span>Дата найма</span>
+                        <strong>{formatDateRu(employee.hiredAt)}</strong>
+                    </div>
+                    <div className="profile-detail-row">
+                        <span>Роль</span>
+                        <strong>{employee.isHrAdmin ? "HR-админ" : "Сотрудник"}</strong>
+                    </div>
+                </div>
+
+                <button className="btn btn-primary btn-full" onClick={onShowPass}>
+                    🪪 Открыть пропуск
+                </button>
+            </div>
+        </div>
+    );
+};
+
 export const App: React.FC = () => {
     const { user, isReady } = useTelegramUser();
     const [employee, setEmployee] = useState<any>(null);
@@ -29,6 +95,7 @@ export const App: React.FC = () => {
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     const [showPass, setShowPass] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     useEffect(() => {
         if (!user?.id) return;
@@ -176,7 +243,10 @@ export const App: React.FC = () => {
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <button
                             id="btn-switch-role"
-                            onClick={() => setSelectedRole(null)}
+                            onClick={() => {
+                                setShowProfile(false);
+                                setSelectedRole(null);
+                            }}
                             title="Сменить роль"
                             style={{
                                 background: "rgba(255,255,255,0.18)",
@@ -213,7 +283,19 @@ export const App: React.FC = () => {
                         >
                             🪪 Пропуск
                         </button>
-                        <div className="avatar">{employee.nameRu.charAt(0)}</div>
+                        {effectiveRole === "employee" ? (
+                            <button
+                                id="btn-open-profile"
+                                className="avatar avatar-button"
+                                onClick={() => setShowProfile(true)}
+                                title="Открыть профиль"
+                                aria-label="Открыть профиль"
+                            >
+                                {employee.nameRu.charAt(0)}
+                            </button>
+                        ) : (
+                            <div className="avatar">{employee.nameRu.charAt(0)}</div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -240,7 +322,13 @@ export const App: React.FC = () => {
             )}
 
             {/* DASHBOARD */}
-            {effectiveRole === "hr" ? (
+            {showProfile && effectiveRole === "employee" ? (
+                <EmployeeProfilePage
+                    employee={employee}
+                    onBack={() => setShowProfile(false)}
+                    onShowPass={() => setShowPass(true)}
+                />
+            ) : effectiveRole === "hr" ? (
                 <AdminDashboard />
             ) : (
                 <EmployeeDashboard

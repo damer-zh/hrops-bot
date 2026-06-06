@@ -594,6 +594,90 @@ select.input-field option {
     outline-offset: 3px;
 }
 
+.header-action-btn {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+    border-radius: 12px;
+    padding: 7px 12px;
+    font-family: "Inter", sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.language-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid var(--green-200);
+    background: var(--green-100);
+    flex-shrink: 0;
+}
+
+.language-toggle button {
+    min-width: 38px;
+    height: 28px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--green-700);
+    font-family: "Inter", sans-serif;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0;
+}
+
+.language-toggle button.active {
+    background: #fff;
+    color: var(--accent-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.language-toggle-dark {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.language-toggle-dark button {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.language-toggle-dark button.active {
+    background: #fff;
+    color: var(--green-700);
+}
+
+@media (max-width: 420px) {
+    .app-header .flex-between {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .app-header .flex-between > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .header-action-btn {
+        padding-inline: 10px;
+    }
+}
+
 /* ==========================================
    PROFILE
    ========================================== */
@@ -904,6 +988,13 @@ select.input-field option {
     justify-content: center;
     height: 100vh;
     gap: 16px;
+    position: relative;
+}
+
+.loading-language {
+    position: absolute;
+    top: 18px;
+    right: 18px;
 }
 
 /* ==========================================
@@ -1057,6 +1148,12 @@ select.input-field option {
     gap: 32px;
     position: relative;
     z-index: 1;
+}
+
+.role-select-language {
+    display: flex;
+    justify-content: center;
+    margin-bottom: -12px;
 }
 
 /* Header section */

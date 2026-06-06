@@ -1,4 +1,5 @@
 import React from "react";
+import { LanguageToggle, useLanguage } from "../language";
 
 type Role = "employee" | "hr" | "guard";
 
@@ -9,6 +10,8 @@ interface RoleSelectProps {
 }
 
 export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin, onSelect }) => {
+    const { t } = useLanguage();
+
     return (
         <div className="role-select-screen">
             {/* Decorative background blobs */}
@@ -17,15 +20,19 @@ export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin,
             <div className="role-select-blob blob-3" />
 
             <div className="role-select-content animate-fade-in">
+                <div className="role-select-language">
+                    <LanguageToggle variant="dark" />
+                </div>
+
                 {/* Logo / Greeting */}
                 <div className="role-select-header">
                     <div className="role-select-logo">🏢</div>
                     <h1 className="role-select-title">HROps</h1>
                     <p className="role-select-greeting">
-                        Добро пожаловать,{" "}
+                        {t("welcome")},{" "}
                         <span className="role-select-name">{employeeName.split(" ")[0]}</span>
                     </p>
-                    <p className="role-select-subtitle">Выберите, как вы входите в систему</p>
+                    <p className="role-select-subtitle">{t("chooseRole")}</p>
                 </div>
 
                 {/* Role Cards */}
@@ -40,9 +47,9 @@ export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin,
                             <span className="role-card-icon">👤</span>
                         </div>
                         <div className="role-card-body">
-                            <div className="role-card-title">Сотрудник</div>
+                            <div className="role-card-title">{t("employeeRole")}</div>
                             <div className="role-card-desc">
-                                Мои заявки, отпуска, документы и онбординг
+                                {t("employeeRoleDesc")}
                             </div>
                         </div>
                         <div className="role-card-arrow">→</div>
@@ -58,9 +65,9 @@ export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin,
                             <span className="role-card-icon">🛡️</span>
                         </div>
                         <div className="role-card-body">
-                            <div className="role-card-title">Охранник</div>
+                            <div className="role-card-title">{t("guardRole")}</div>
                             <div className="role-card-desc">
-                                Сканирование QR-пропусков сотрудников
+                                {t("guardRoleDesc")}
                             </div>
                         </div>
                         <div className="role-card-arrow">→</div>
@@ -77,15 +84,15 @@ export const RoleSelect: React.FC<RoleSelectProps> = ({ employeeName, isHrAdmin,
                         </div>
                         <div className="role-card-body">
                             <div className="role-card-title">
-                                HR-панель
+                                {t("hrPanelRole")}
                                 {!isHrAdmin && (
-                                    <span className="role-card-badge-lock">Только HR</span>
+                                    <span className="role-card-badge-lock">{t("hrOnly")}</span>
                                 )}
                             </div>
                             <div className="role-card-desc">
                                 {isHrAdmin
-                                    ? "Управление сотрудниками, заявки, аналитика"
-                                    : "Доступно только HR-администраторам"}
+                                    ? t("hrPanelDesc")
+                                    : t("hrRestricted")}
                             </div>
                         </div>
                         <div className="role-card-arrow">→</div>

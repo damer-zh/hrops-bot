@@ -10,6 +10,7 @@ import { OnboardingForm } from "./components/forms/OnboardingForm";
 import { RoleSelect } from "./components/RoleSelect";
 import api from "./api";
 import * as signalR from "@microsoft/signalr";
+import { LanguageToggle, type Language, useLanguage } from "./language";
 
 type Role = "employee" | "hr" | "guard";
 
@@ -31,11 +32,11 @@ type EmployeeProfile = {
     isHrAdmin?: boolean;
 };
 
-const formatDateRu = (value?: string | null) => {
-    if (!value) return "Не указано";
+const formatDate = (value: string | null | undefined, language: Language, fallback: string) => {
+    if (!value) return fallback;
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return "Не указано";
-    return date.toLocaleDateString("ru-RU", {
+    if (Number.isNaN(date.getTime())) return fallback;
+    return date.toLocaleDateString(language === "kk" ? "kk-KZ" : "ru-RU", {
         day: "numeric",
         month: "long",
         year: "numeric",
@@ -84,13 +85,14 @@ const EmployeeProfilePage: React.FC<{
     onRemoveAvatar: () => void;
     onViewAvatar: () => void;
 }> = ({ employee, avatarUrl, onBack, onShowPass, onAvatarChange, onRemoveAvatar, onViewAvatar }) => {
+    const { language, t } = useLanguage();
     const initial = employee.nameRu?.trim().charAt(0).toUpperCase() || "?";
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     return (
         <div className="profile-page animate-fade-in delay-100">
             <button className="profile-back-btn" onClick={onBack}>
-                ← Назад
+                ← {t("back")}
             </button>
 
             <div className="profile-card glass-card no-hover">
@@ -101,17 +103,17 @@ const EmployeeProfilePage: React.FC<{
                         if (avatarUrl) onViewAvatar();
                         else fileInputRef.current?.click();
                     }}
-                    title={avatarUrl ? "Посмотреть аватарку" : "Поставить аватарку"}
-                    aria-label={avatarUrl ? "Посмотреть аватарку" : "Поставить аватарку"}
+                    title={avatarUrl ? t("viewAvatar") : t("setAvatar")}
+                    aria-label={avatarUrl ? t("viewAvatar") : t("setAvatar")}
                 >
                     {avatarUrl ? <img src={avatarUrl} alt="" /> : initial}
                 </button>
                 <div className="profile-name">{employee.nameRu}</div>
                 <div className="profile-role">
-                    {employee.position || "Должность не указана"}
+                    {employee.position || t("positionMissing")}
                 </div>
                 <div className="profile-department">
-                    {employee.department || "Отдел не указан"}
+                    {employee.department || t("departmentMissing")}
                 </div>
 
                 <input
@@ -132,7 +134,7 @@ const EmployeeProfilePage: React.FC<{
                         className="btn btn-secondary btn-sm"
                         onClick={() => fileInputRef.current?.click()}
                     >
-                        Поставить
+                        {t("set")}
                     </button>
                     <button
                         type="button"
@@ -140,7 +142,7 @@ const EmployeeProfilePage: React.FC<{
                         onClick={onViewAvatar}
                         disabled={!avatarUrl}
                     >
-                        Посмотреть
+                        {t("view")}
                     </button>
                     <button
                         type="button"
@@ -148,27 +150,27 @@ const EmployeeProfilePage: React.FC<{
                         onClick={onRemoveAvatar}
                         disabled={!avatarUrl}
                     >
-                        Убрать
+                        {t("remove")}
                     </button>
                 </div>
 
                 <div className="profile-details">
                     <div className="profile-detail-row">
-                        <span>ID сотрудника</span>
+                        <span>{t("employeeId")}</span>
                         <strong>{employee.id}</strong>
                     </div>
                     <div className="profile-detail-row">
-                        <span>Дата найма</span>
-                        <strong>{formatDateRu(employee.hiredAt)}</strong>
+                        <span>{t("hiredDate")}</span>
+                        <strong>{formatDate(employee.hiredAt, language, t("notSpecified"))}</strong>
                     </div>
                     <div className="profile-detail-row">
-                        <span>Роль</span>
-                        <strong>{employee.isHrAdmin ? "HR-админ" : "Сотрудник"}</strong>
+                        <span>{t("role")}</span>
+                        <strong>{employee.isHrAdmin ? t("hrAdmin") : t("employee")}</strong>
                     </div>
                 </div>
 
                 <button className="btn btn-primary btn-full" onClick={onShowPass}>
-                    🪪 Открыть пропуск
+                    🪪 {t("openPass")}
                 </button>
             </div>
         </div>
@@ -176,6 +178,7 @@ const EmployeeProfilePage: React.FC<{
 };
 
 export const App: React.FC = () => {
+    const { t } = useLanguage();
     const { user, isReady } = useTelegramUser();
     const [employee, setEmployee] = useState<any>(null);
     const [notifications, setNotifications] = useState<RealtimeNotification[]>([]);
@@ -255,8 +258,11 @@ export const App: React.FC = () => {
     if (errorMsg) {
         return (
             <div className="loading-page">
+                <div className="loading-language">
+                    <LanguageToggle />
+                </div>
                 <div style={{ fontSize: "2.5rem" }}>⚠️</div>
-                <div style={{ color: "#dc2626", fontWeight: 700 }}>Ошибка загрузки</div>
+                <div style={{ color: "#dc2626", fontWeight: 700 }}>{t("loadingError")}</div>
                 <div style={{ wordBreak: "break-all", fontSize: "0.8rem", color: "var(--text-secondary)", textAlign: "center" }}>
                     {errorMsg}
                 </div>
@@ -267,8 +273,11 @@ export const App: React.FC = () => {
     if (!isReady || (user && !employee)) {
         return (
             <div className="loading-page">
+                <div className="loading-language">
+                    <LanguageToggle />
+                </div>
                 <div className="spinner" />
-                <div className="text-subtitle animate-fade-in">Загружаем профиль...</div>
+                <div className="text-subtitle animate-fade-in">{t("loadingProfile")}</div>
             </div>
         );
     }
@@ -276,10 +285,13 @@ export const App: React.FC = () => {
     if (!user || !employee) {
         return (
             <div className="loading-page animate-fade-in">
+                <div className="loading-language">
+                    <LanguageToggle />
+                </div>
                 <div style={{ fontSize: "3rem" }}>🤖</div>
                 <h2 style={{ color: "var(--accent-primary)" }}>HROps Bot</h2>
                 <p className="text-subtitle" style={{ textAlign: "center" }}>
-                    Пожалуйста, откройте приложение внутри Telegram.
+                    {t("openInTelegram")}
                 </p>
             </div>
         );
@@ -333,7 +345,7 @@ export const App: React.FC = () => {
             })
             .catch((err) => {
                 console.error(err);
-                window.Telegram?.WebApp?.showAlert?.("Не удалось поставить аватарку");
+                window.Telegram?.WebApp?.showAlert?.(t("avatarSetError"));
             });
     };
 
@@ -350,7 +362,7 @@ export const App: React.FC = () => {
                 <div className="flex-between" style={{ position: "relative", zIndex: 1 }}>
                     <div style={{ minWidth: 0 }}>
                         <div style={{ fontSize: "0.75rem", opacity: 0.8, fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                            {effectiveRole === "hr" ? "🏢 HR-Панель" : "👤 Сотрудник"}
+                            {effectiveRole === "hr" ? `🏢 ${t("hrPanel")}` : `👤 ${t("employee")}`}
                         </div>
                         <div style={{ fontWeight: 700, fontSize: "1.15rem", marginTop: "2px" }}>
                             {employee.nameRu}
@@ -366,50 +378,27 @@ export const App: React.FC = () => {
                                 setShowProfile(false);
                                 setSelectedRole(null);
                             }}
-                            title="Сменить роль"
-                            style={{
-                                background: "rgba(255,255,255,0.18)",
-                                border: "1px solid rgba(255,255,255,0.35)",
-                                color: "#fff",
-                                borderRadius: 12,
-                                padding: "7px 14px",
-                                fontSize: "0.82rem",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                            }}
+                            title={t("switchRoleTitle")}
+                            className="header-action-btn"
                         >
-                            ⇄ Роль
+                            ⇄ {t("switchRole")}
                         </button>
                         <button
                             id="btn-show-pass"
                             onClick={() => setShowPass(true)}
-                            style={{
-                                background: "rgba(255,255,255,0.18)",
-                                border: "1px solid rgba(255,255,255,0.35)",
-                                color: "#fff",
-                                borderRadius: 12,
-                                padding: "7px 14px",
-                                fontSize: "0.82rem",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 6,
-                            }}
+                            className="header-action-btn"
                         >
-                            🪪 Пропуск
+                            🪪 {t("pass")}
                         </button>
+                        <LanguageToggle variant="dark" />
                         <button
                             id="btn-open-profile"
                             type="button"
                             className="avatar avatar-button"
                             onClick={openProfile}
                             onPointerUp={openProfile}
-                            title="Открыть профиль"
-                            aria-label="Открыть профиль"
+                            title={t("openProfile")}
+                            aria-label={t("openProfile")}
                         >
                             {avatarUrl ? <img src={avatarUrl} alt="" /> : initial}
                         </button>
@@ -425,7 +414,7 @@ export const App: React.FC = () => {
                             <span>🔔</span>
                             <span>
                                 {item.message}
-                                {item.reason ? ` Причина: ${item.reason}` : ""}
+                                {item.reason ? ` ${t("reason")}: ${item.reason}` : ""}
                             </span>
                             <button
                                 onClick={() => setNotifications((prev) => prev.filter((_, idx) => idx !== i))}
@@ -483,11 +472,11 @@ export const App: React.FC = () => {
                             type="button"
                             className="avatar-preview-close"
                             onClick={() => setShowAvatarPreview(false)}
-                            aria-label="Закрыть просмотр аватарки"
+                            aria-label={t("closeAvatarPreview")}
                         >
                             ✕
                         </button>
-                        <img src={avatarUrl} alt="Аватарка сотрудника" />
+                        <img src={avatarUrl} alt={t("employeeAvatar")} />
                     </div>
                 </div>
             )}
